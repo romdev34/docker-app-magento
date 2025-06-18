@@ -155,7 +155,7 @@ services:
      labels:
        - "traefik.enable=true"
        # URL pour accéder à ce conteneur
-       - "traefik.http.routers.varnish.rule=Host(`magento.front.dev.local`)"
+       - "traefik.http.routers.varnish.rule=Host(`magento.dev.local`)"
        # Activation de TLS
        - "traefik.http.routers.varnish.tls=true"
        # Si le port est différent de 80, utilisez le service suivant:

@@ -4,18 +4,13 @@
 
 * récupérer les clés d'acces https://commercemarketplace.adobe.com/customer/accessKeys/
 *  Créer fichier auth.json en indiquant les clés d'accès
-> {
-"http-basic": {
-"repo.magento.com": {
-"username": "eecdecf62c00bf3eaecd56968600e317",
-"password": "3891a1aa722af7c707ccab05a0812b41"
-}
-}
-}
+
 * Il faut récupérer un fichier env.php dans app/etc/
   sous ce format
   https://github.com/artifakt-io/base-magento/blob/2.4/app/etc/env.php.sample
 
+
+### ETAPES CREATION DU PROJET
 
 #### récupérer le projet app-magento
 git clone git@gitlab.com:docker3580037/app-magento.git
@@ -28,6 +23,7 @@ git clone git@gitlab.com:docker3580037/app-magento.git
 #### supprimer le dossier src
 
 Ensuite il faut récupéerer les sources magento2 dans un dossier src/
+Changer la version latest en fonction des versions images app-php dispos
 
 ```shell
 docker run -it --rm \
@@ -42,7 +38,7 @@ create-project --repository-url=https://repo.magento.com/ magento/project-commun
 docker run -it --rm \
 -u $(id -u):$(id -g) \
 -v $(pwd):/src \
--v ~/.composer:/.config/composer \
+-v .composer:/.config/composer \
 -e COMPOSER_AUTH="$(cat ./auth.json)" \
 ulysse699/composer:latest \
 create-project --repository-url=https://repo.magento.com/ magento/project-community-edition src
@@ -56,10 +52,27 @@ https://github.com/magento/magento2/blob/2.4.6-p2/.gitignore``
 in
 ## Install en local
 
-### rajouter dans /etc/hosts magento.front.dev.local
+```shell
+docker compose up
+```
+
+rajouter dans /etc/hosts magento.dev.local
 
 ```shell
-docker exec app-magento-magento-1 \
+docker compose exec mysql bash -c "mysql -uroot -proot << EOF
+REVOKE ALL PRIVILEGES ON *.* FROM 'rootless'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'rootless'@'%';
+ALTER USER 'rootless'@'%' REQUIRE NONE WITH
+MAX_QUERIES_PER_HOUR 0
+MAX_CONNECTIONS_PER_HOUR 0
+MAX_UPDATES_PER_HOUR 0
+MAX_USER_CONNECTIONS 0;
+EOF"
+```
+
+```shell
+docker compose exec magento bash
+
 bin/magento \
         setup:install \
         --base-url=$BASE_URL\
@@ -210,7 +223,7 @@ Pour jouer un composer install faire
 docker run -it --rm \
 -u $(id -u):$(id -g) \
 -v $(pwd)/src:/src \
--e COMPOSER_AUTH="$(cat ./auth.json)" \
+-e COMPOSER_AUTH="$(cat ./.composer/auth.json)" \
 ulysse699/composer:latest \
 install
 ```
@@ -220,7 +233,7 @@ un composer update faire
 docker run -it --rm \
 -u $(id -u):$(id -g) \
 -v $(pwd)/src:/src \
--e COMPOSER_AUTH="$(cat ./auth.json)" \
+-e COMPOSER_AUTH="$(cat ./.composer/auth.json)" \
 ulysse699/composer:latest \
 update
 ```
@@ -287,18 +300,6 @@ sudo nano /etc/hosts
 
 ```shell
 docker compose up
-```
-
-```shell
-docker compose exec mysql bash -c "mysql -uroot -proot << EOF
-REVOKE ALL PRIVILEGES ON *.* FROM 'rootless'@'%';
-GRANT ALL PRIVILEGES ON *.* TO 'rootless'@'%';
-ALTER USER 'rootless'@'%' REQUIRE NONE WITH
-MAX_QUERIES_PER_HOUR 0
-MAX_CONNECTIONS_PER_HOUR 0
-MAX_UPDATES_PER_HOUR 0
-MAX_USER_CONNECTIONS 0;
-EOF"
 ```
 
 ```shell
