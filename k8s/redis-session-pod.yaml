@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-session
+  labels:
+    app: redis-session
+spec:
+  containers:
+    - image: redis:7.0
+      name: redis-session
+      volumeMounts:
+        - name: redis-session
+          mountPath: /data
+  volumes:
+    - name: redis-session
+      persistentVolumeClaim:
+        claimName: data-redis-session

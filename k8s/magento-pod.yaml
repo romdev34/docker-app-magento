@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: magento
+  namespace: default
+  labels:
+    app: magento
+spec:
+  containers:
+  - image: ulysse699/app-magento:latest
+    imagePullPolicy: Always
+    name: magento
+    envFrom:
+    - configMapRef:
+        name: magento-env
+    volumeMounts:
+    - name: src
+      mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+    ports:
+    - containerPort: 8080
+  volumes:
+    - name: src
+      persistentVolumeClaim:
+        claimName: data-magento

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: magento-env
+  namespace: default
+data:
+  MAGE_MODE: production
+  MAGE_RUN_TYPE: website
+  MAGE_RUN_CODE: base
+  PHP_MEMORY_LIMIT: 2048M
+  PHP_MAX_EXECUTION_TIME: "18000"
+  PHP_ZLIB__output_compression: "On"
+  PHP_SENDMAIL_PATH: /usr/sbin/sendmail-local --smtp-addr=mailhog:1025
+  MYSQL_DATABASE: magento
+  MYSQL_USER: rootless
+  MYSQL_PASSWORD: nopassword
+  MYSQL_SERVICE_HOST: mysql
+  BASE_URL: http://159.65.210.68/
+  ADMIN_FIRSTNAME: admin
+  ADMIN_LASTNAME: admin
+  ADMIN_EMAIL: admin@admin.com
+  ADMIN_USER: admin
+  ADMIN_PASSWORD: admin123
+  LANGUAGE: fr_FR
+  CURRENCY: EUR
+  TIMEZONE: Europe/Paris
+  SEARCH_ENGINE: elasticsearch7
+  ELASTICSEARCH_HOST: elastic
+  ELASTICSEARCH_PORT: "9200"
+  USE_REWRITE: "1"
+  BACKEND_FRONTNAME: admin
+  REDIS_SESSION_HOST: redis-session
+  REDIS_SESSION_PORT: "6379"
+  REDIS_CACHE_HOST: redis-cache
+  REDIS_CACHE_PORT: "6379"

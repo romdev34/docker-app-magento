@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: magento-deployment
+  labels:
+    app: magento
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: magento
+  template:
+    metadata:
+      labels:
+        app: magento
+    spec:
+      containers:
+        - name: magento
+          image: ulysse699/app-magento:latest
+          ports:
+            - containerPort: 8080

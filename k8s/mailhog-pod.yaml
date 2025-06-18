@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mailhog
+  labels:
+    app: mailhog
+spec:
+  containers:
+    - image: mailhog/mailhog:latest
+      name: mailhog
+      ports:
+        - containerPort: 8025
+          name: port1
+        - containerPort: 1025
+          name: port2

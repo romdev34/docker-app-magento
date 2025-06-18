@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  containers:
+  - image: mysql:8.0
+    name: mysql
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: root
+    - name: MYSQL_DATABASE
+      value: magento
+    - name: MYSQL_USER
+      value: rootless
+    - name: MYSQL_PASSWORD
+      value: nopassword
+    volumeMounts:
+    - name: data
+      mountPath: /var/lib/mysql
+    ports:
+    - containerPort: 3306
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: data-mysql
