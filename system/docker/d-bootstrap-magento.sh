@@ -5,10 +5,8 @@ set -e
 
   if [ "$MAGE_MODE" != "developer" ]
   then
-
-  bash /docker/get-env.sh romdev34-magento2-bucket eu-west-3 env.php env.php &&
-  mv env.php app/etc/env.php
-fi
+# mettre custom
+  fi
 
 if [ -f "/var/www/app/etc/env.php" ]; then
 
