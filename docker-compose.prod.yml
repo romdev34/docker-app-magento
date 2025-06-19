@@ -16,7 +16,6 @@ services:
       - traefik.http.services.mailhog.loadbalancer.server.port=8025
     networks:
     - proxy
-    - magento   
 
   mysql:
     image: mysql:${MYSQL_VERSION:-8.0}
@@ -31,7 +30,6 @@ services:
       - '3306:3306'
     networks:
     - proxy
-    - magento
 
   phpmyadmin:
     labels:
@@ -57,7 +55,6 @@ services:
       - '8082:80'
     networks:
     - proxy
-    - magento
 
   redis-cache:
     image: redis:${REDIS_VERSION:-7.0}
@@ -72,7 +69,6 @@ services:
       - redis-session-data:/data:rw,delegated
     networks:
     - proxy
-    - magento
 
   elasticsearch:
     image: elasticsearch:${ELASTICSEARCH_VERSION:-8.8.0}
@@ -95,7 +91,6 @@ services:
       - '9200:9200'
     networks:
     - proxy
-    - magento
 
   rabbitmq:
     image: rabbitmq:${RABBITMQ_VERSION:-3.11-management}
@@ -116,7 +111,6 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq:rw,delegated
     networks:
     - proxy
-    - magento
 
   magento:
     build: .
@@ -154,7 +148,6 @@ services:
       - '8080:8080'
     networks:
     - proxy
-    - magento
 
   varnish:
     image: varnish:${VARNISH_VERSION:-7.3}
@@ -179,7 +172,6 @@ services:
       - magento
     networks:
     - proxy
-    - magento
 
 volumes:
   mysql-data:
@@ -192,5 +184,3 @@ volumes:
 networks:
   proxy:
     external: true
-  magento:
-    internal: true
