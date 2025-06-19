@@ -4,3 +4,4 @@
 src/*
 /auth.json
 .env.prod
+src/

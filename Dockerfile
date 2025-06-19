@@ -32,7 +32,7 @@ FROM ulysse699/app-php:latest as magento-with-vendors
 USER root
 
 RUN apt-get update
-RUN apt-get install xxd
+RUN apt-get install -y xxd
 RUN apt-get install -y cron
 RUN apt-get install -y vim
 
