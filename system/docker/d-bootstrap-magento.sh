@@ -7,13 +7,10 @@ set -e
   then
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
     composer install \
-    --prefer-dist \
     --no-interaction \
     --no-scripts \
     --no-progress \
-    --no-dev; \
-    composer dump-autoload \
-    --optimize
+    --no-dev;
   else
   (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
   composer install
@@ -26,14 +23,16 @@ if [ -f "/var/www/app/etc/env.php" ]; then
     bin/magento setup:upgrade --keep-generated
 
   fi
-# on redirige le retour de la bin/magento se:db:status dans dev/null pour ne pas l'afficher et on redirige les erreurs dans l'output qui lui meme a été déja redirigé dans une pseudo classe pour ne pas etre affiché
-  until bin/magento setup:db:status >/dev/null 2>&1; do
-# on reidirige le message Waiting for upgrade... dans le STDERR et donc afficher l'erreur avec le message
-    (echo >&2 "[!] Waiting for upgrade to be ready...")
+  
+# 3. Test Magento DB
+until bin/magento setup:db:status >/dev/null 2>&1; do
+  echo "[!] Waiting for Magento database..."
+  sleep 2
+done
 
-    sleep 2
-#
-  done
+# 4. Optimisation finale
+composer dump-autoload --optimize --classmap-authoritative
+
 
   if [ "$MAGE_MODE" != "developer" ]
   then
