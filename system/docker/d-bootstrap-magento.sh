@@ -8,7 +8,6 @@ set -e
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
     composer install \
     --prefer-dist \
-    --no-autoloader \
     --no-interaction \
     --no-scripts \
     --no-progress \
