@@ -40,7 +40,7 @@ services:
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.phpmyadmin.tls=true"
-      - "traefik.http.routers.mailhog.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.phpmyadmin.tls.certresolver=letsencrypt"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
     depends_on:
