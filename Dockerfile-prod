@@ -16,6 +16,7 @@ COPY .composer /var/cache/composer
 
 COPY src /src
 
+
 FROM ulysse699/app-php:latest as magento-with-vendors
 
 USER root
@@ -26,8 +27,6 @@ RUN apt-get install -y cron
 RUN apt-get install -y vim
 
 COPY --chown=rootless:rootless src /var/www
-
-COPY --chown=rootless:rootless --from=vendors-installation src/vendor /var/www/vendor
 
 COPY --chown=rootless:rootless system /
 
