@@ -5,7 +5,7 @@ set -e
 
   if [ "$MAGE_MODE" != "developer" ]
   then
-# mettre custom
+    (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
   fi
 
 if [ -f "/var/www/app/etc/env.php" ]; then
