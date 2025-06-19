@@ -13,6 +13,7 @@ services:
       - "traefik.http.routers.mailhog.tls=true"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+      - "traefik.http.routers.mailhog.tls.certresolver=letsencrypt"
       - traefik.http.services.mailhog.loadbalancer.server.port=8025
     networks:
     - proxy
@@ -39,6 +40,7 @@ services:
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.phpmyadmin.tls=true"
+      - "traefik.http.routers.mailhog.tls.certresolver=letsencrypt"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
     depends_on:
@@ -104,6 +106,7 @@ services:
       - "traefik.http.routers.rabbitmq.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.rabbitmq.tls=true"
+      - "traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
       - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
@@ -125,6 +128,7 @@ services:
       - "traefik.http.routers.magento.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.magento.tls=true"
+      - "traefik.http.routers.magento.tls.certresolver=letsencrypt"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
       - traefik.http.services.magento.loadbalancer.server.port=8080
@@ -160,6 +164,7 @@ services:
       - "traefik.http.routers.varnish.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.varnish.tls=true"
+      - "traefik.http.routers.varnish.tls.certresolver=letsencrypt"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
       - traefik.http.services.varnish.loadbalancer.server.port=80
