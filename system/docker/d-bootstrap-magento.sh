@@ -6,6 +6,18 @@ set -e
   if [ "$MAGE_MODE" != "developer" ]
   then
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
+    composer install \
+    --prefer-dist \
+    --no-autoloader \
+    --no-interaction \
+    --no-scripts \
+    --no-progress \
+    --no-dev; \
+    composer dump-autoload \
+    --optimize
+  else
+  (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
+  composer install
   fi
 
 if [ -f "/var/www/app/etc/env.php" ]; then
