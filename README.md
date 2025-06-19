@@ -67,7 +67,7 @@ docker compose -f docker-compose.prod.yml up
 rajouter dans /etc/hosts magento.dev.local
 
 ```shell
-docker compose exec mysql bash -c "mysql -uroot -proot << EOF
+docker compose -f docker-compose.prod.yml exec mysql bash -c "mysql -uroot -proot << EOF
 REVOKE ALL PRIVILEGES ON *.* FROM 'rootless'@'%';
 GRANT ALL PRIVILEGES ON *.* TO 'rootless'@'%';
 ALTER USER 'rootless'@'%' REQUIRE NONE WITH

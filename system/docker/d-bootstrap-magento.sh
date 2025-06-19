@@ -46,8 +46,6 @@ if [ -f "/var/www/app/etc/env.php" ]; then
       setup:static-content:deploy \
       --jobs=6 \
       --force \
-      fr_FR \
-      en_US
-
+      --all-areas
   fi
 fi

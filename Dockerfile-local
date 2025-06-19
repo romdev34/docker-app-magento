@@ -17,15 +17,7 @@ COPY .composer /var/cache/composer
 COPY src /src
 
 RUN set -eux; \
-composer install \
---prefer-dist \
---no-autoloader \
---no-interaction \
---no-scripts \
---no-progress \
---no-dev; \
-composer dump-autoload \
---optimize
+composer install
 
 FROM ulysse699/app-php:latest as magento-with-vendors
 

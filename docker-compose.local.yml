@@ -142,8 +142,8 @@ services:
     - m2
 
   magento:
-    build: .
-    image: ulysse699/app-magento:latest
+    context: .
+    dockerfile: Dockerfile-local
     hostname: magento
     env_file:
       - .env
