@@ -14,8 +14,6 @@ services:
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
       - traefik.http.services.mailhog.loadbalancer.server.port=8025
-    depends_on:
-      - traefik
     networks:
     - proxy
     - magento   
@@ -46,7 +44,6 @@ services:
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
     depends_on:
-      - traefik
       - mysql
     links:
       - mysql
@@ -94,8 +91,6 @@ services:
       - xpack.security.enabled=false
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data:rw,delegated
-    depends_on:
-      - traefik
     ports:
       - '9200:9200'
     networks:
@@ -119,8 +114,6 @@ services:
       - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq:rw,delegated
-    depends_on:
-      - traefik
     networks:
     - proxy
     - magento
@@ -151,7 +144,6 @@ services:
       - elasticsearch
       - rabbitmq
     depends_on:
-      - traefik
       - mailhog
       - mysql
       - redis-cache
@@ -184,14 +176,12 @@ services:
     links:
       - magento
     depends_on:
-      - traefik
       - magento
     networks:
     - proxy
     - magento
 
 volumes:
-  traefik-data:
   mysql-data:
   redis-cache-data:
   redis-session-data:

@@ -50,10 +50,18 @@ create-project --repository-url=https://repo.magento.com/ magento/project-commun
 Si non le récupérer dans la version officielle magento dans github par exemple:
 https://github.com/magento/magento2/blob/2.4.6-p2/.gitignore``
 in
-## Install en local
+## Installation 
+
+>local
 
 ```shell
-docker compose up
+docker compose -f docker-compose.local.yml up
+```
+
+>production
+
+```shell
+docker compose -f docker-compose.prod.yml up
 ```
 
 rajouter dans /etc/hosts magento.dev.local
@@ -145,6 +153,8 @@ Ou bien faire directement dans le conteneur (en ayant pris soin de vérifier les
         --cache-backend-redis-compression-lib=""
 
 ```
+### install en prod
+
 
 ## Install dans k8s
 
