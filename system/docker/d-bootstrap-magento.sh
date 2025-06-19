@@ -45,7 +45,6 @@ if [ -f "/var/www/app/etc/env.php" ]; then
       bin/magento \
       setup:static-content:deploy \
       --jobs=6 \
-      --force \
-      --all-areas
+      --force
   fi
 fi
