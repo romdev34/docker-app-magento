@@ -16,14 +16,6 @@ set -e
   composer install
   fi
 
-if [ -f "/var/www/app/etc/env.php" ]; then
-
-  if [ "$(bin/magento setup:db:status)" == '1' ]; then
-
-    bin/magento setup:upgrade --keep-generated
-
-  fi
-  
 # 3. Test Magento DB
 until bin/magento setup:db:status >/dev/null 2>&1; do
   echo "[!] Waiting for Magento database..."
@@ -32,6 +24,17 @@ done
 
 # 4. Optimisation finale
 composer dump-autoload --optimize --classmap-authoritative
+
+
+if [ -f "/var/www/app/etc/env.php" ]; then
+
+  if [ "$(bin/magento setup:db:status)" == '1' ]; then
+
+    bin/magento setup:upgrade --keep-generated
+
+  fi
+  
+
 
 
   if [ "$MAGE_MODE" != "developer" ]
