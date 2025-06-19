@@ -1,0 +1,206 @@
+version: "3.8"
+
+services:
+
+  mailhog:
+    image: mailhog/mailhog:${MAILHOG_VERSION:-latest}
+    labels:
+      - "traefik.enable=true"
+      # URL pour accéder à ce conteneur
+      - "traefik.http.routers.mailhog.rule=Host(`mailhog.romdev.ovh`)"
+      - "traefik.http.routers.mailhog.entrypoints=websecure"
+      # Activation de TLS
+      - "traefik.http.routers.mailhog.tls=true"
+      # Si le port est différent de 80, utilisez le service suivant:
+      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+      - traefik.http.services.mailhog.loadbalancer.server.port=8025
+    depends_on:
+      - traefik
+    networks:
+    - proxy
+    - magento   
+
+  mysql:
+    image: mysql:${MYSQL_VERSION:-8.0}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-magento}
+      MYSQL_USER: ${MYSQL_USER:-rootless}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-nopassword}
+    volumes:
+      - mysql-data:/var/lib/mysql:rw,delegated
+    ports:
+      - '3306:3306'
+    networks:
+    - proxy
+    - magento
+
+  phpmyadmin:
+    labels:
+      - "traefik.enable=true"
+      # URL pour accéder à ce conteneur
+      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.romdev.ovh`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
+      # Activation de TLS
+      - "traefik.http.routers.phpmyadmin.tls=true"
+      # Si le port est différent de 80, utilisez le service suivant:
+      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+    depends_on:
+      - traefik
+      - mysql
+    links:
+      - mysql
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - PMA_HOST=mysql
+      - MYSQL_ROOT_PASSWORD=root
+      - PMA_USER=rootless
+      - PMA_PASSWORD=nopassword
+    ports:
+      - '8082:80'
+    networks:
+    - proxy
+    - magento
+
+  redis-cache:
+    image: redis:${REDIS_VERSION:-7.0}
+    volumes:
+      - redis-cache-data:/data:rw,delegated
+    networks:
+    - proxy
+
+  redis-session:
+    image: redis:${REDIS_VERSION:-7.0}
+    volumes:
+      - redis-session-data:/data:rw,delegated
+    networks:
+    - proxy
+    - magento
+
+  elasticsearch:
+    image: elasticsearch:${ELASTICSEARCH_VERSION:-8.8.0}
+    command: >
+      bash -c '
+        if [ ! -d "plugins/analysis-phonetic" ]; then
+          bin/elasticsearch-plugin install --batch analysis-phonetic;
+        fi;
+        if [ ! -d "plugins/analysis-icu" ]; then
+          bin/elasticsearch-plugin install --batch analysis-icu;
+        fi;
+        exec /usr/local/bin/docker-entrypoint.sh elasticsearch;
+      '
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data:rw,delegated
+    depends_on:
+      - traefik
+    ports:
+      - '9200:9200'
+    networks:
+    - proxy
+    - magento
+
+  rabbitmq:
+    image: rabbitmq:${RABBITMQ_VERSION:-3.11-management}
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-rootless}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-nopassword}
+    labels:
+      - "traefik.enable=true"
+      # URL pour accéder à ce conteneur
+      - "traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.romdev.ovh`)"
+      - "traefik.http.routers.rabbitmq.entrypoints=websecure"
+      # Activation de TLS
+      - "traefik.http.routers.rabbitmq.tls=true"
+      # Si le port est différent de 80, utilisez le service suivant:
+      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq:rw,delegated
+    depends_on:
+      - traefik
+    networks:
+    - proxy
+    - magento
+
+  magento:
+    build: .
+    image: ulysse699/app-magento:latest
+    hostname: magento
+    env_file:
+      - .env.prod
+    labels:
+      - "traefik.enable=true"
+      # URL pour accéder à ce conteneur
+      - "traefik.http.routers.magento.rule=Host(`magento.romdev.ovh`)"
+      - "traefik.http.routers.magento.entrypoints=websecure"
+      # Activation de TLS
+      - "traefik.http.routers.magento.tls=true"
+      # Si le port est différent de 80, utilisez le service suivant:
+      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+      - traefik.http.services.magento.loadbalancer.server.port=8080
+    volumes:
+      - ./src:/var/www:rw,delegated
+    links:
+      - mailhog
+      - mysql
+      - redis-cache
+      - redis-session
+      - elasticsearch
+      - rabbitmq
+    depends_on:
+      - traefik
+      - mailhog
+      - mysql
+      - redis-cache
+      - redis-session
+      - elasticsearch
+      - rabbitmq
+    ports:
+      - '8080:8080'
+    networks:
+    - proxy
+    - magento
+
+  varnish:
+    image: varnish:${VARNISH_VERSION:-7.3}
+    environment:
+      VARNISH_SIZE: ${VARNISH_SIZE:-2G}
+    labels:
+      - "traefik.enable=true"
+      # URL pour accéder à ce conteneur
+      - "traefik.http.routers.varnish.rule=Host(`magento.romdev.ovh`)"
+      - "traefik.http.routers.varnish.entrypoints=websecure"
+      # Activation de TLS
+      - "traefik.http.routers.varnish.tls=true"
+      # Si le port est différent de 80, utilisez le service suivant:
+      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+      - traefik.http.services.varnish.loadbalancer.server.port=80
+    volumes:
+      - varnish-data:/var/lib/varnish:rw,delegated
+      - ./default.vcl:/etc/varnish/default.vcl:ro
+    links:
+      - magento
+    depends_on:
+      - traefik
+      - magento
+    networks:
+    - proxy
+    - magento
+
+volumes:
+  traefik-data:
+  mysql-data:
+  redis-cache-data:
+  redis-session-data:
+  elasticsearch-data:
+  rabbitmq-data:
+  varnish-data:
+
+networks:
+  proxy:
+    external: true
+  magento:
+    internal: true

@@ -3,3 +3,4 @@
 /.composer
 src/*
 /auth.json
+.env.prod

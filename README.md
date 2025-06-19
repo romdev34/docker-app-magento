@@ -215,6 +215,20 @@ docker exec testmage-magento-1 bin/magento config:set web/secure/use_in_adminhtm
 
 Vérifier dans le store config également l'URL de l'admin si nécessaire
 
+## RABBITMQ
+modifier le env.php selon les RABBITMQ_USER et RABBITMQ_PASSWORD définis dans le env et dans docker-compose.yml
+
+```'queue' => [
+    'consumers_wait_for_messages' => 1,
+    'amqp' => [
+        'host' => 'rabbitmq',
+        'port' => '5672',
+        'user' => 'rootless',
+        'password' => 'nopassword',
+        'virtualhost' => 'magento'
+    ]
+]
+```
 ## Commande docker
 
 
@@ -288,14 +302,16 @@ rm -rf src/app/etc/env.php
 sudo nano /etc/hosts
 ```
 
+SSL en local
+générer les certificats en local dans traefik/certs
+Les importer dans chrome et firefox
 ```text
 # Add into /etc/hosts
-127.0.0.1 traefik.local
-127.0.0.1 mailhog.local
-127.0.0.1 phpmyadmin.local
-127.0.0.1 rabbitmq.local
-127.0.0.1 magento-backend.local
-127.0.0.1 magento-frontend.local
+127.0.0.1 traefik.dev.local
+127.0.0.1 mailhog.dev.local
+127.0.0.1 phpmyadmin.dev.local
+127.0.0.1 rabbitmq.dev.local
+127.0.0.1 magento-dev.local
 ```
 
 ```shell
@@ -467,3 +483,9 @@ Lorsque l'on souhaite switcher d'une version avec elasticsuite / magesuite a la 
 Il faut rejouer le setup install
 Il faut remettre par défaut le theme luma dans la base de donnée
 Il faut désintaller et réinstaller la base selon l'installation choisie
+
+
+###
+
+Déploiement en prod
+créer un fichier .env.prod

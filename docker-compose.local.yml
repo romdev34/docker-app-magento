@@ -8,15 +8,21 @@ services:
       - "80:80"
       - "443:443"
     labels:
-      # Permettre à ce conteneur d'être accessible par traefik
-      # Pour plus d'information, voir : https://docs.traefik.io/providers/docker/#exposedbydefault
-      - "traefik.enable=true"
-      # Utilise la configuration du routeur "traefik" définie dans le fichier de configuration dynamique : ./traefik/config.yml
-      - "traefik.http.routers.traefik=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.dev.local`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      # Basic Auth - le mot de passe est 'Romain2024', généré avec htpasswd
+     # - "traefik.http.middlewares.auth.basicauth.usersfile=/data/users"
     volumes:
-      - ./traefik:/etc/traefik
+      - ./traefik/traefik-local.yml:/traefik.yml:ro
+      - ./traefik/dynamic.yml:/dynamic.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./certs:/etc/certs
+      # uniquement en local
+      - ./traefik/certs:/certs:ro
+    networks:
+    - m2
 
   mailhog:
     image: mailhog/mailhog:${MAILHOG_VERSION:-latest}
@@ -24,6 +30,7 @@ services:
       - "traefik.enable=true"
       # URL pour accéder à ce conteneur
       - "traefik.http.routers.mailhog.rule=Host(`mailhog.dev.local`)"
+      - "traefik.http.routers.mailhog.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.mailhog.tls=true"
       # Si le port est différent de 80, utilisez le service suivant:
@@ -31,6 +38,8 @@ services:
       - traefik.http.services.mailhog.loadbalancer.server.port=8025
     depends_on:
       - traefik
+    networks:
+    - m2   
 
   mysql:
     image: mysql:${MYSQL_VERSION:-8.0}
@@ -43,12 +52,15 @@ services:
       - mysql-data:/var/lib/mysql:rw,delegated
     ports:
       - '3306:3306'
+    networks:
+    - m2
 
   phpmyadmin:
     labels:
       - "traefik.enable=true"
       # URL pour accéder à ce conteneur
       - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.dev.local`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.phpmyadmin.tls=true"
       # Si le port est différent de 80, utilisez le service suivant:
@@ -66,23 +78,33 @@ services:
       - PMA_PASSWORD=nopassword
     ports:
       - '8082:80'
+    networks:
+    - m2
 
   redis-cache:
     image: redis:${REDIS_VERSION:-7.0}
     volumes:
       - redis-cache-data:/data:rw,delegated
+    networks:
+    - m2
 
   redis-session:
     image: redis:${REDIS_VERSION:-7.0}
     volumes:
       - redis-session-data:/data:rw,delegated
+    networks:
+    - m2
 
   elasticsearch:
     image: elasticsearch:${ELASTICSEARCH_VERSION:-8.8.0}
     command: >
       bash -c '
-        bin/elasticsearch-plugin install analysis-phonetic;
-        bin/elasticsearch-plugin install analysis-icu;
+        if [ ! -d "plugins/analysis-phonetic" ]; then
+          bin/elasticsearch-plugin install --batch analysis-phonetic;
+        fi;
+        if [ ! -d "plugins/analysis-icu" ]; then
+          bin/elasticsearch-plugin install --batch analysis-icu;
+        fi;
         exec /usr/local/bin/docker-entrypoint.sh elasticsearch;
       '
     environment:
@@ -94,6 +116,8 @@ services:
       - traefik
     ports:
       - '9200:9200'
+    networks:
+    - m2
 
   rabbitmq:
     image: rabbitmq:${RABBITMQ_VERSION:-3.11-management}
@@ -104,14 +128,18 @@ services:
       - "traefik.enable=true"
       # URL pour accéder à ce conteneur
       - "traefik.http.routers.rabbitmq.rule=Host(`rabbitmq.dev.local`)"
+      - "traefik.http.routers.rabbitmq.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.rabbitmq.tls=true"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+      - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq:rw,delegated
     depends_on:
       - traefik
+    networks:
+    - m2
 
   magento:
     build: .
@@ -123,6 +151,7 @@ services:
       - "traefik.enable=true"
       # URL pour accéder à ce conteneur
       - "traefik.http.routers.magento.rule=Host(`magento.dev.local`)"
+      - "traefik.http.routers.magento.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.magento.tls=true"
       # Si le port est différent de 80, utilisez le service suivant:
@@ -147,29 +176,34 @@ services:
       - rabbitmq
     ports:
       - '8080:8080'
-
+    networks:
+    - m2
+      
   varnish:
-     image: varnish:${VARNISH_VERSION:-7.3}
-     environment:
-       VARNISH_SIZE: ${VARNISH_SIZE:-2G}
-     labels:
-       - "traefik.enable=true"
-       # URL pour accéder à ce conteneur
-       - "traefik.http.routers.varnish.rule=Host(`magento.dev.local`)"
-       # Activation de TLS
-       - "traefik.http.routers.varnish.tls=true"
-       # Si le port est différent de 80, utilisez le service suivant:
-       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
-       - traefik.http.services.varnish.loadbalancer.server.port=80
-     volumes:
-       - varnish-data:/var/lib/varnish:rw,delegated
-       - ./default.vcl:/etc/varnish/default.vcl:ro
-     links:
-       - magento
-     depends_on:
-       - traefik
-       - magento
-
+    image: varnish:${VARNISH_VERSION:-7.3}
+    environment:
+      VARNISH_SIZE: ${VARNISH_SIZE:-2G}
+    labels:
+      - "traefik.enable=true"
+      # URL pour accéder à ce conteneur
+      - "traefik.http.routers.varnish.rule=Host(`magento.dev.local`)"
+      - "traefik.http.routers.varnish.entrypoints=websecure"
+      # Activation de TLS
+      - "traefik.http.routers.varnish.tls=true"
+      # Si le port est différent de 80, utilisez le service suivant:
+      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
+      - traefik.http.services.varnish.loadbalancer.server.port=80
+    volumes:
+      - varnish-data:/var/lib/varnish:rw,delegated
+      - ./default.vcl:/etc/varnish/default.vcl:ro
+    links:
+      - magento
+    depends_on:
+      - traefik
+      - magento
+    networks:
+    - m2
+            
 volumes:
   traefik-data:
   mysql-data:
@@ -178,3 +212,7 @@ volumes:
   elasticsearch-data:
   rabbitmq-data:
   varnish-data:
+
+networks:
+  m2:
+    external: true

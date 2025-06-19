@@ -1,0 +1,40 @@
+api:
+  dashboard: true
+  insecure: false
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: m2
+  file:
+    filename: /dynamic.yml
+    watch: true
+
+tls:
+  options:
+    default:
+      minVersion: "VersionTLS12"
+      sslProtocols:
+        - "TLSv1.2"
+        - "TLSv1.3"
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/local.crt
+        keyFile: /certs/local.key
+
+log:
+  level: INFO
