@@ -3,28 +3,16 @@ set -e
 
 (>&2 echo "[*] Bootstrap MAGENTO")
 
-# Nettoyage complet
-cleanup_generated() {
-    (>&2 echo "[*] Cleaning generated files")
-    rm -rf generated/code/* generated/metadata/* var/cache/* var/page_cache/* var/view_preprocessed/* || true
-    mkdir -p generated/code generated/metadata var/cache var/page_cache var/view_preprocessed
-    chmod -R 775 generated/ var/ || true
-}
-
   if [ "$MAGE_MODE" != "developer" ]
   then
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
     composer install \
     --prefer-dist \
     --no-interaction \
-    --no-autoloader \
     --no-scripts \
     --no-progress \
-    --no-plugins \
     --no-dev;
-    # Réactiver les plugins et générer un autoloader basique
-    (>&2 echo "[*] Generating basic autoloader")
-    composer dump-autoload --no-scripts --no-optimize
+
   else
   (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
   composer install
@@ -53,17 +41,18 @@ if [ -f "/var/www/app/etc/env.php" ]; then
       (>&2 echo "[*] Bootstrap COMPILE")
       bin/magento se:di:co
 
-      # MAINTENANT on peut optimiser l'autoloader
+  # MAINTENANT on peut optimiser l'autoloader
       (>&2 echo "[*] Optimizing autoloader")
-      composer dump-autoload --optimize
+      composer dump-autoload --optimize --classmap-authoritative
+
       (>&2 echo "[*] Bootstrap DEPLOY STATIC")
       bin/magento \
       setup:static-content:deploy \
       --jobs=6 \
       --force
     
-      # Nettoyage final du cache
-      (>&2 echo "[*] Cleaning cache")
-      bin/magento cache:clean
+        # Nettoyage final du cache
+        (>&2 echo "[*] Cleaning cache")
+        bin/magento cache:clean
   fi
 fi
