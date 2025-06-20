@@ -21,8 +21,8 @@ set -e
 if [ -f "/var/www/app/etc/env.php" ]; then
 # on redirige le retour de la bin/magento se:db:status dans dev/null pour ne pas l'afficher et on redirige les erreurs dans l'output qui lui meme a été déja redirigé dans une pseudo classe pour ne pas etre affiché
   until bin/magento setup:db:status >/dev/null 2>&1; do
-# on reidirige le message Waiting for upgrade... dans le STDERR et donc afficher l'erreur avec le message
-    (echo >&2 "[!] Waiting for upgrade to be ready...")
+# on reidirige le message Waiting for DATABASE to be ready... dans le STDERR et donc afficher l'erreur avec le message
+    (echo >&2 "[!] Waiting for DATABASE to be ready...")
     sleep 2
 #
   done

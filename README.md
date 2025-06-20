@@ -54,16 +54,44 @@ in
 
 >local
 
+
 ```shell
 docker compose -f docker-compose.local.yml up --build
+```
+
+
+```shell
+docker compose -f docker-compose.local.yml up
+```
+
+```shell
+docker compose -f docker-compose.local.yml down
+```
+
+```shell
+docker compose -f docker-compose.local.yml exec magento bash
+```
+
+### si soucis avec la DB reinitialisation du volume
+```shell
+docker compose -f docker-compose.local.yml down -v
 ```
 
 >production
 
 ```shell
-docker compose -f docker-compose.prod.yml up
+docker compose -f docker-compose.prod.yml up --build
 ```
 
+```shell
+docker compose -f docker-compose.prod.yml down
+```
+
+```shell
+docker compose -f docker-compose.prod.yml exec magento bash
+```
+
+penser à enlever le fichier .env.php si on doit réinstaller le projet
 rajouter dans /etc/hosts magento.dev.local
 
 ```shell
@@ -178,24 +206,24 @@ docker push ulysse699/app-magento:latest
 * Installation de magento 2 dans l'environnement.
 > le configmap devra etre mis à jour en fonction de l'environnement
 
-## MAILHOG
+## MAIL
 Si erreur Unsupported sendmail command flags \"/usr/sbin/sendmail-local --smtp-addr=mailhog:1025\"; must be one of \"-bs\" or \"-t\" 
 
 Rajouter dans app/etc/env.php
 ```
-'system' => [
-'default' => [
-'system' => [
-'smtp' => [
-'disable' => '0',
-'transport' => 'smtp',
-'host' => 'mailhog',
-'port' => '1025',
-'auth' => 'none'
-]
-]
-]
-],
+    'system' => [
+        'default' => [
+            'system' => [
+                'smtp' => [
+                    'disable' => '0',
+                    'transport' => 'smtp',
+                    'host' => 'mailhog',
+                    'port' => '1025',
+                    'auth' => 'none'
+                ]
+            ]
+        ]
+    ],
 ```
 ## REDIS
 ```shell

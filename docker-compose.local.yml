@@ -24,22 +24,26 @@ services:
     networks:
     - m2
 
-  mailhog:
-    image: mailhog/mailhog:${MAILHOG_VERSION:-latest}
+  mailpit:
+    image: axllent/mailpit:latest
     labels:
       - "traefik.enable=true"
       # URL pour accéder à ce conteneur
-      - "traefik.http.routers.mailhog.rule=Host(`mailhog.dev.local`)"
-      - "traefik.http.routers.mailhog.entrypoints=websecure"
+      - "traefik.http.routers.mailpit.rule=Host(`mailpit.dev.local`)"
+      - "traefik.http.routers.mailpit.entrypoints=websecure"
       # Activation de TLS
-      - "traefik.http.routers.mailhog.tls=true"
+      - "traefik.http.routers.mailpit.tls=true"
       # Si le port est différent de 80, utilisez le service suivant:
       # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
-      - traefik.http.services.mailhog.loadbalancer.server.port=8025
+      - traefik.http.services.mailpit.loadbalancer.server.port=8025
+    ports:
+      - "8025:8025"  # Interface web
+      - "1025:1025"  # SMTP
     depends_on:
       - traefik
     networks:
     - m2   
+ 
 
   mysql:
     image: mysql:${MYSQL_VERSION:-8.0}
@@ -142,8 +146,9 @@ services:
     - m2
 
   magento:
-    context: .
-    dockerfile: Dockerfile-local
+    build:
+      context: .
+      dockerfile: Dockerfile-local
     hostname: magento
     env_file:
       - .env
@@ -160,7 +165,7 @@ services:
     volumes:
       - ./src:/var/www:rw,delegated
     links:
-      - mailhog
+      - mailpit
       - mysql
       - redis-cache
       - redis-session
@@ -168,7 +173,7 @@ services:
       - rabbitmq
     depends_on:
       - traefik
-      - mailhog
+      - mailpit
       - mysql
       - redis-cache
       - redis-session
