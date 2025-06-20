@@ -26,7 +26,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-rootless}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-nopassword}
     volumes:
-      - mysql-data:/var/lib/mysql:rw,delegated
+      - magento-mysql-data:/var/lib/mysql:rw,delegated
     ports:
       - '3306:3306'
     networks:
@@ -180,7 +180,7 @@ services:
     - proxy
 
 volumes:
-  mysql-data:
+  magento-mysql-data:
   redis-cache-data:
   redis-session-data:
   elasticsearch-data:
