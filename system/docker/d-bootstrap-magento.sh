@@ -10,9 +10,12 @@ if [ "$MAGE_MODE" != "developer" ]; then
   --optimize-autoloader \
   --no-dev;
 
+  # MAINTENANT on peut optimiser l'autoloader
+  (>&2 echo "[*] Optimizing autoloader")
+  composer dump-autoload --optimize --classmap-authoritative
+
   bin/magento setup:upgrade
 
-  bin/magento deploy:mode:set production
 
 else
   (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
