@@ -54,6 +54,8 @@ if [ -f "/var/www/app/etc/env.php" ]; then
       setup:static-content:deploy \
       --jobs=6 \
       --force
+      --strategy=quick \
+      en_US fr_FR
     
         # Nettoyage final du cache
         (>&2 echo "[*] Cleaning cache")
