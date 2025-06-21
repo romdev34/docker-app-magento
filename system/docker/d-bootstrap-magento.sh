@@ -6,12 +6,13 @@ set -e
   if [ "$MAGE_MODE" != "developer" ]
   then
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
+    bin/magento maintenance:enable
 
-      composer install \
+    composer install \
     --optimize-autoloader \
     --no-dev;
-    
-    bin/magento maintenance:enable
+
+
 
     rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* generated/code/* pub/static/*
 
@@ -29,7 +30,7 @@ if [ -f "/var/www/app/etc/env.php" ]; then
     sleep 2
 #
   done
-  
+  fi
 
   if [ "$(bin/magento setup:db:status)" == '1' ]; then
       (>&2 echo "[*] Bootstrap setup:upgrade")
@@ -63,4 +64,3 @@ if [ -f "/var/www/app/etc/env.php" ]; then
         bin/magento cache:flush
 
   fi
-fi
