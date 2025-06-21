@@ -35,13 +35,6 @@ if [ -f "/var/www/app/etc/env.php" ]; then
   if [ "$(bin/magento setup:db:status)" == '1' ]; then
 
     bin/magento setup:upgrade
-
-  fi
-
-
-  if [ "$MAGE_MODE" != "developer" ]
-  then
-
       (>&2 echo "[*] Bootstrap COMPILE")
       bin/magento se:di:co
 
@@ -61,5 +54,6 @@ if [ -f "/var/www/app/etc/env.php" ]; then
         (>&2 echo "[*] Cleaning cache")
         bin/magento cache:clean
         bin/magento cache:flush
+
   fi
 fi
