@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PROXY_FILE="var/www/generated/code/Magento/Framework/App/ResourceConnection/Proxy.php"
+PROXY_FILE="/var/www/generated/code/Magento/Framework/App/ResourceConnection/Proxy.php"
 
 (>&2 echo "[*] Bootstrap MAGENTO")
 
@@ -11,6 +11,8 @@ if [ "$MAGE_MODE" != "developer" ]; then
   composer install \
   --optimize-autoloader \
   --no-dev;
+
+  composer dump-autoload 
 
   if [ ! -f "$PROXY_FILE" ]; then
     echo "[!] Proxy class missing: $PROXY_FILE"
