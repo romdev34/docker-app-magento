@@ -12,7 +12,7 @@ if [ "$MAGE_MODE" != "developer" ]; then
 
   # MAINTENANT on peut optimiser l'autoloader
   (>&2 echo "[*] Optimizing autoloader")
-  composer dump-autoload --optimize --classmap-authoritative
+  composer dump-autoload --optimize
 
   bin/magento setup:upgrade
 
