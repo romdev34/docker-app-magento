@@ -14,8 +14,8 @@ set -e
  # MAINTENANT on peut optimiser l'autoloader
       (>&2 echo "[*] Optimizing autoloader")
       composer dump-autoload --optimize --classmap-authoritative
-
-    rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* generated/code/* pub/static/*
+      (>&2 echo "[*] Bootstrap COMPILE")
+      bin/magento se:di:co
 
 
   else
@@ -36,8 +36,7 @@ if [ -f "/var/www/app/etc/env.php" ]; then
   if [ "$(bin/magento setup:db:status)" == '1' ]; then
       (>&2 echo "[*] Bootstrap setup:upgrade")
       bin/magento setup:upgrade
-      (>&2 echo "[*] Bootstrap COMPILE")
-      bin/magento se:di:co
+
 
  
 
