@@ -32,7 +32,7 @@ if [ -f "/var/www/app/etc/env.php" ]; then
 fi
 
 if [ "$MAGE_MODE" != "developer" ]; then
-  if [ "$(bin/magento setup:db:status)" == '1' ]; then
+
 
     (>&2 echo "[*] Bootstrap COMPILE")
     bin/magento se:di:co
@@ -64,5 +64,4 @@ if [ "$MAGE_MODE" != "developer" ]; then
 
       (>&2 echo "[*] Disabling maintenance mode")
       bin/magento maintenance:disable
-  fi
 fi

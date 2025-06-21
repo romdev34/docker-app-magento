@@ -44,6 +44,15 @@ ulysse699/composer:latest \
 create-project --repository-url=https://repo.magento.com/ magento/project-community-edition src
 ```
 
+
+>dans le dossier magento
+find var generated vendor pub/static pub/media app/etc -type f -exec chmod u+w {} +
+CopyToggle Text Wrapping
+find var generated vendor pub/static pub/media app/etc -type d -exec chmod u+w {} +
+CopyToggle Text Wrapping
+chmod u+x bin/magento
+
+
 > Copier coller le fichier auth.json dans le dossier src crée précédemment.**
 
 `` vérifier que le .gitignore a bien été crée dans src/
@@ -52,7 +61,7 @@ https://github.com/magento/magento2/blob/2.4.6-p2/.gitignore``
 in
 ## Installation 
 
->local
+### local
 
 
 ```shell
@@ -77,7 +86,9 @@ docker compose -f docker-compose.local.yml exec magento bash
 docker compose -f docker-compose.local.yml down -v
 ```
 
->production
+### production
+
+
 
 ```shell
 docker compose -f docker-compose.prod.yml up --build
