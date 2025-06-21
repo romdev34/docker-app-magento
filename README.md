@@ -46,9 +46,11 @@ create-project --repository-url=https://repo.magento.com/ magento/project-commun
 
 
 >dans le dossier magento
-find var generated vendor pub/static pub/media app/etc -type f -exec chmod u+w {} +
+find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
 CopyToggle Text Wrapping
-find var generated vendor pub/static pub/media app/etc -type d -exec chmod u+w {} +
+find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+CopyToggle Text Wrapping
+chown -R :<web server group> .
 CopyToggle Text Wrapping
 chmod u+x bin/magento
 

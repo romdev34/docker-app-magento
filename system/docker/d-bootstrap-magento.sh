@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-PROXY_FILE="/var/www/generated/code/Magento/Framework/App/ResourceConnection/Proxy.php"
-
 (>&2 echo "[*] Bootstrap MAGENTO")
 
 
@@ -14,38 +12,8 @@ if [ "$MAGE_MODE" != "developer" ]; then
 
   composer dump-autoload 
 
-  if [ ! -f "$PROXY_FILE" ]; then
-    echo "[!] Proxy class missing: $PROXY_FILE"
-    echo "[*] Forcing Magento into developer mode to generate missing proxies"
-    bin/magento deploy:mode:set developer
-    bin/magento maintenance:enable
-
-    bin/magento setup:di:compile
-    (>&2 echo "[*] Bootstrap DEPLOY STATIC")
-
-    bin/magento \
-    setup:static-content:deploy \
-    --jobs=6 \
-    --force \
-    --strategy=quick \
-    en_US fr_FR
-
-    bin/magento \
-    setup:static-content:deploy \
-    --jobs=6 \
-    --force \
-    --strategy=quick \
-    --area adminhtml \
-    fr_FR
-
-    # Nettoyage final du cache
-    (>&2 echo "[*] Cleaning cache")
-    bin/magento cache:flush
-  else
-    (>&2 echo "[*] Mode maintenance activé")
-    bin/magento deploy:mode:set production
-    (>&2 echo "[*] Disabling maintenance mode")
-    bin/magento maintenance:disable
+  (>&2 echo "[*] Mode maintenance activé")
+  bin/magento maintenance:enable
   fi
 
   if [ -f "/var/www/app/etc/env.php" ]; then
@@ -58,9 +26,29 @@ if [ "$MAGE_MODE" != "developer" ]; then
     done
 
     bin/magento setup:upgrade --keep-generated
+
+    bin/magento setup:di:compile
+      (>&2 echo "[*] Bootstrap DEPLOY STATIC")
+
+      bin/magento \
+      setup:static-content:deploy \
+      --jobs=6 \
+      --force \
+      --strategy=quick \
+      en_US fr_FR
+
+      bin/magento \
+      setup:static-content:deploy \
+      --jobs=6 \
+      --force \
+      --strategy=quick \
+      --area adminhtml \
+      fr_FR
+
     bin/magento maintenance:disable
   else
     (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
     composer install
   fi
 fi
+
