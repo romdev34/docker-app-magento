@@ -6,14 +6,15 @@ set -e
   if [ "$MAGE_MODE" != "developer" ]
   then
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
+
+      composer install \
+    --optimize-autoloader \
+    --no-dev;
+    
     bin/magento maintenance:enable
 
     rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* generated/code/* pub/static/*
 
-
-    composer install \
-    --optimize-autoloader \
-    --no-dev;
 
   else
   (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
