@@ -21,10 +21,14 @@ if [ "$MAGE_MODE" != "developer" ]; then
     --optimize-autoloader \
     --no-dev;
 
-    bin/magento setup:upgrade --keep-generated
+   # 🔥 Nettoyage des anciens fichiers générés
+    rm -rf generated/code/* var/cache/* var/page_cache/* var/view_preprocessed/*
 
+    # ⚠️ Compilation d'abord, AVANT tout `bin/magento` qui peut charger une classe
     (>&2 echo "[*] Bootstrap COMPILE")
-    bin/magento se:di:co
+    bin/magento setup:di:compile
+
+    bin/magento setup:upgrade --keep-generated
       
 
     (>&2 echo "[*] Bootstrap DEPLOY STATIC")
