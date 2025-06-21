@@ -5,10 +5,10 @@ set -e
 
 if [ "$MAGE_MODE" != "developer" ]; then
   (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
-  sudo find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
-  sudo find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
-  sudo chown -R :www-data .
-  sudo chmod u+x bin/magento
+   find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
+   find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+   chown -R :www-data .
+   chmod u+x bin/magento
 
   composer install \
   --optimize-autoloader \
