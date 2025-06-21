@@ -11,11 +11,9 @@ if [ "$MAGE_MODE" != "developer" ]; then
     --no-dev;
 
     bin/magento deploy:mode:set developer
-
-    (>&2 echo "[*] Bootstrap COMPILE")
-    bin/magento setup:di:compile
   
     (>&2 echo "[*] Mode maintenance activé")
+    # cette commande implique le di:compile et le deploy static-content
     bin/magento deploy:mode:set production
 
   if [ -f "/var/www/app/etc/env.php" ]; then
@@ -29,23 +27,6 @@ if [ "$MAGE_MODE" != "developer" ]; then
 
     bin/magento setup:upgrade --keep-generated
       
-
-    (>&2 echo "[*] Bootstrap DEPLOY STATIC")
-    bin/magento \
-    setup:static-content:deploy \
-    --jobs=6 \
-    --force \
-    --strategy=quick \
-    en_US fr_FR
-
-    bin/magento \
-    setup:static-content:deploy \
-    --jobs=6 \
-    --force \
-    --strategy=quick \
-    --area adminhtml \
-    fr_FR
-
       # Nettoyage final du cache
       (>&2 echo "[*] Cleaning cache")
       bin/magento cache:clean
