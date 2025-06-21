@@ -39,20 +39,20 @@ if [ "$MAGE_MODE" != "developer" ]; then
       
     # MAINTENANT on peut optimiser l'autoloader
     (>&2 echo "[*] Optimizing autoloader")
-    composer dump-autoload --optimize --classmap-authoritative
+    composer dump-autoload --optimize
 
     (>&2 echo "[*] Bootstrap DEPLOY STATIC")
     bin/magento \
     setup:static-content:deploy \
     --jobs=6 \
-    --force
+    --force \
     --strategy=quick \
     en_US fr_FR
 
     bin/magento \
     setup:static-content:deploy \
     --jobs=6 \
-    --force
+    --force \
     --strategy=quick \
     --area adminhtml \
     fr_FR
