@@ -13,11 +13,8 @@ set -e
     bin/magento maintenance:enable
 
 
- # MAINTENANT on peut optimiser l'autoloader
-      (>&2 echo "[*] Optimizing autoloader")
-      composer dump-autoload --optimize --classmap-authoritative
-      (>&2 echo "[*] Bootstrap COMPILE")
-      bin/magento se:di:co
+    (>&2 echo "[*] Bootstrap COMPILE")
+    bin/magento se:di:co
 
 
   else
@@ -40,7 +37,9 @@ if [ -f "/var/www/app/etc/env.php" ]; then
       bin/magento setup:upgrade
 
 
- 
+  # MAINTENANT on peut optimiser l'autoloader
+      (>&2 echo "[*] Optimizing autoloader")
+      composer dump-autoload --optimize --classmap-authoritative
 
       (>&2 echo "[*] Bootstrap DEPLOY STATIC")
       bin/magento \
