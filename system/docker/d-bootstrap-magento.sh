@@ -38,7 +38,6 @@ if [ "$MAGE_MODE" != "developer" ]; then
 
     # Nettoyage final du cache
     (>&2 echo "[*] Cleaning cache")
-    bin/magento cache:clean
     bin/magento cache:flush
   else
     (>&2 echo "[*] Mode maintenance activé")
@@ -57,7 +56,7 @@ if [ "$MAGE_MODE" != "developer" ]; then
     done
 
     bin/magento setup:upgrade --keep-generated
-
+    bin/magento maintenance:disable
   else
     (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
     composer install
