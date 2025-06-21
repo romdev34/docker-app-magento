@@ -11,8 +11,9 @@ set -e
     composer install \
     --optimize-autoloader \
     --no-dev;
-
-
+ # MAINTENANT on peut optimiser l'autoloader
+      (>&2 echo "[*] Optimizing autoloader")
+      composer dump-autoload --optimize --classmap-authoritative
 
     rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* generated/code/* pub/static/*
 
@@ -38,9 +39,7 @@ if [ -f "/var/www/app/etc/env.php" ]; then
       (>&2 echo "[*] Bootstrap COMPILE")
       bin/magento se:di:co
 
-  # MAINTENANT on peut optimiser l'autoloader
-      (>&2 echo "[*] Optimizing autoloader")
-      composer dump-autoload --optimize --classmap-authoritative
+ 
 
       (>&2 echo "[*] Bootstrap DEPLOY STATIC")
       bin/magento \
