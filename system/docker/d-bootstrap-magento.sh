@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PROXY_FILE="/var/www/generated/code/Magento/Framework/App/ResourceConnection/Proxy.php"
+PROXY_FILE="var/www/generated/code/Magento/Framework/App/ResourceConnection/Proxy.php"
 
 (>&2 echo "[*] Bootstrap MAGENTO")
 
