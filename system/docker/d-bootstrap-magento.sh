@@ -6,6 +6,18 @@ set -e
 if [ "$MAGE_MODE" != "developer" ]; then
   (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
 
+    composer install \
+    --optimize-autoloader \
+    --no-dev;
+
+    bin/magento deploy:mode:set developer
+
+    (>&2 echo "[*] Bootstrap COMPILE")
+    bin/magento setup:di:compile
+  
+    (>&2 echo "[*] Mode maintenance activé")
+    bin/magento deploy:mode:set production
+
   if [ -f "/var/www/app/etc/env.php" ]; then
     # on redirige le retour de la bin/magento se:db:status dans dev/null pour ne pas l'afficher et on redirige les erreurs dans l'output qui lui meme a été déja redirigé dans une pseudo classe pour ne pas etre affiché
     until mysql -h"mysql" -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
@@ -14,19 +26,6 @@ if [ "$MAGE_MODE" != "developer" ]; then
         sleep 2
     #
     done
-
-    bin/magento maintenance:enable
-
-    composer install \
-    --optimize-autoloader \
-    --no-dev;
-
-   # 🔥 Nettoyage des anciens fichiers générés
-    rm -rf generated/code/* var/cache/* var/page_cache/* var/view_preprocessed/*
-
-    # ⚠️ Compilation d'abord, AVANT tout `bin/magento` qui peut charger une classe
-    (>&2 echo "[*] Bootstrap COMPILE")
-    bin/magento setup:di:compile
 
     bin/magento setup:upgrade --keep-generated
       
