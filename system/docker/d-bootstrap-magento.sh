@@ -33,8 +33,8 @@ if [ -f "/var/www/app/etc/env.php" ]; then
   
 
   if [ "$(bin/magento setup:db:status)" == '1' ]; then
-
-    bin/magento setup:upgrade
+      (>&2 echo "[*] Bootstrap setup:upgrade")
+      bin/magento setup:upgrade
       (>&2 echo "[*] Bootstrap COMPILE")
       bin/magento se:di:co
 
@@ -49,6 +49,14 @@ if [ -f "/var/www/app/etc/env.php" ]; then
       --force
       --strategy=quick \
       en_US fr_FR
+
+      bin/magento \
+      setup:static-content:deploy \
+      --jobs=6 \
+      --force
+      --strategy=quick \
+      --area adminhtml \
+      fr_FR
     
         # Nettoyage final du cache
         (>&2 echo "[*] Cleaning cache")
