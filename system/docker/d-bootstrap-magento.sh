@@ -6,12 +6,11 @@ set -e
 if [ "$MAGE_MODE" != "developer" ]; then
   (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
 
+  bin/magento maintenance:enable
+
   composer install \
   --optimize-autoloader \
   --no-dev;
-   # MAINTENANT on peut optimiser l'autoloader
-    (>&2 echo "[*] Optimizing autoloader")
-    composer dump-autoload --optimize
 
   bin/magento setup:upgrade --keep-generated
 
