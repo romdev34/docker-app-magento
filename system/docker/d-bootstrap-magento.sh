@@ -6,11 +6,15 @@ set -e
   if [ "$MAGE_MODE" != "developer" ]
   then
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
+    bin/magento maintenance:enable
+
+    bin/magento deploy:mode:set production
+
+    rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* generated/code/* pub/static/*
+
+
     composer install \
-    --prefer-dist \
-    --no-interaction \
-    --no-scripts \
-    --no-progress \
+    --optimize-autoloader \
     --no-dev;
 
   else
@@ -30,7 +34,7 @@ if [ -f "/var/www/app/etc/env.php" ]; then
 
   if [ "$(bin/magento setup:db:status)" == '1' ]; then
 
-    bin/magento setup:upgrade --keep-generated
+    bin/magento setup:upgrade
 
   fi
 
@@ -54,5 +58,6 @@ if [ -f "/var/www/app/etc/env.php" ]; then
         # Nettoyage final du cache
         (>&2 echo "[*] Cleaning cache")
         bin/magento cache:clean
+        bin/magento cache:flush
   fi
 fi
