@@ -9,6 +9,9 @@ if [ "$MAGE_MODE" != "developer" ]; then
   composer install \
   --optimize-autoloader \
   --no-dev;
+   # MAINTENANT on peut optimiser l'autoloader
+    (>&2 echo "[*] Optimizing autoloader")
+    composer dump-autoload --optimize
 
   # MAINTENANT on peut optimiser l'autoloader
   (>&2 echo "[*] Optimizing autoloader")
@@ -37,9 +40,6 @@ if [ "$MAGE_MODE" != "developer" ]; then
     (>&2 echo "[*] Bootstrap COMPILE")
     bin/magento se:di:co
       
-    # MAINTENANT on peut optimiser l'autoloader
-    (>&2 echo "[*] Optimizing autoloader")
-    composer dump-autoload --optimize
 
     (>&2 echo "[*] Bootstrap DEPLOY STATIC")
     bin/magento \
