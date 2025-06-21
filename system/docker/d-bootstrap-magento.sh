@@ -5,7 +5,6 @@ set -e
 
 if [ "$MAGE_MODE" != "developer" ]; then
   (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
-  bin/magento maintenance:enable
 
   bin/magento deploy:mode:set developer || true
 
