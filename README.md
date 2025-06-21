@@ -209,7 +209,7 @@ docker push ulysse699/app-magento:latest
 ## MAIL
 Si erreur Unsupported sendmail command flags \"/usr/sbin/sendmail-local --smtp-addr=mailhog:1025\"; must be one of \"-bs\" or \"-t\" 
 
-Rajouter dans app/etc/env.php
+Rajouter dans app/etc/env.php (pour mailhog ou mailpit si mailpit)
 ```
     'system' => [
         'default' => [
@@ -527,3 +527,7 @@ Il faut désintaller et réinstaller la base selon l'installation choisie
 
 Déploiement en prod
 créer un fichier .env.prod
+
+Si soucis d'affichge pour le BO
+
+bin/magento  setup:static-content:deploy -a adminhtml -l fr_FR
