@@ -13,6 +13,14 @@ if [ "$MAGE_MODE" != "developer" ]; then
   composer dump-autoload 
 
   (>&2 echo "[*] Mode maintenance activé")
+
+  echo "[*] Waiting for Elasticsearch to be ready..."
+  until curl -s "elasticsearch:9200" | grep -q "You Know, for Search"; do
+    echo "[!] Elasticsearch not ready yet. Retrying in 2s..."
+    sleep 2
+  done
+  echo "[✓] Elasticsearch is up!"
+
   bin/magento maintenance:enable
 
   if [ -f "/var/www/app/etc/env.php" ]; then
