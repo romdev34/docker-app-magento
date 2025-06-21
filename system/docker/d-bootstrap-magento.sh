@@ -8,8 +8,6 @@ set -e
     (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
     bin/magento maintenance:enable
 
-    bin/magento deploy:mode:set production
-
     rm -rf var/cache/* var/page_cache/* var/view_preprocessed/* generated/code/* pub/static/*
 
 
