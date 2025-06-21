@@ -5,12 +5,14 @@ set -e
 
   if [ "$MAGE_MODE" != "developer" ]
   then
-    (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
-    bin/magento maintenance:enable
-
     composer install \
     --optimize-autoloader \
     --no-dev;
+
+    (>&2 echo "[*] STARTING MAGENTO PRODUCTION MODE")
+    bin/magento maintenance:enable
+
+
  # MAINTENANT on peut optimiser l'autoloader
       (>&2 echo "[*] Optimizing autoloader")
       composer dump-autoload --optimize --classmap-authoritative
