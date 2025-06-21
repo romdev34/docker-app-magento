@@ -14,7 +14,6 @@ if [ "$MAGE_MODE" != "developer" ]; then
 
   (>&2 echo "[*] Mode maintenance activé")
   bin/magento maintenance:enable
-  fi
 
   if [ -f "/var/www/app/etc/env.php" ]; then
     # on redirige le retour de la bin/magento se:db:status dans dev/null pour ne pas l'afficher et on redirige les erreurs dans l'output qui lui meme a été déja redirigé dans une pseudo classe pour ne pas etre affiché
@@ -46,9 +45,9 @@ if [ "$MAGE_MODE" != "developer" ]; then
       fr_FR
 
     bin/magento maintenance:disable
-  else
-    (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
-    composer install
   fi
+else
+  (>&2 echo "[*] STARTING MAGENTO DEVELOPER MODE")
+  composer install
 fi
 
