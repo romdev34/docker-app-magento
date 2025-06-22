@@ -36,12 +36,12 @@ RUN mkdir -p /home/rootless && \
     touch /home/rootless/magento.cron.log && \
     chmod 644 /home/rootless/magento.cron.log
 
-RUN echo '* * * * * /usr/local/bin/php /var/www/bin/magento cron:run 2>&1 | grep -v "Ran jobs by schedule" >> /home/rootless/magento.cron.log' \
-    > /home/rootless/mycron && \
-    crontab /home/rootless/mycron
-
 RUN set -eux; \
 echo "/docker/d-bootstrap-magento.sh" >> /docker/d-bootstrap.list; \
 chmod +x /docker/d-bootstrap-magento.sh
 
 USER rootless
+
+RUN echo '* * * * * /usr/local/bin/php /var/www/bin/magento cron:run 2>&1 | grep -v "Ran jobs by schedule" >> /home/rootless/magento.cron.log' \
+    > /home/rootless/mycron && \
+    crontab /home/rootless/mycron
