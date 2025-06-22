@@ -335,6 +335,7 @@ system/full_page_cache/varnish/backend_port \
 ```
 
 ```shell
+docker compose -f docker-compose.prod.yml exec -it varnish
 varnishadm 'ban req.url ~ .'
 ```
 

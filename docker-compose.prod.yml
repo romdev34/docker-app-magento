@@ -27,6 +27,10 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-nopassword}
     volumes:
       - magento-mysql-data:/var/lib/mysql:rw,delegated
+    command: >
+      --innodb_buffer_pool_size=512M
+      --max_allowed_packet=64M
+      --innodb_log_file_size=256M
     ports:
       - '127.0.0.1:3387:3306'
     healthcheck:
