@@ -31,22 +31,8 @@ COPY --chown=rootless:rootless src /var/www
 
 COPY --chown=rootless:rootless system /
 
-
-    # Créer les fichiers de log avec les bonnes permissions
-RUN mkdir -p /var/www/var/log && \
-    touch /var/www/var/log/cron.log && \
-    touch /var/mycron && \
-    chmod 644 /var/www/var/log/cron.log && \
-    chmod 644 /var/mycron
-
-RUN chown -R rootless:rootless /var/mycron
-
 RUN set -eux; \
 echo "/docker/d-bootstrap-magento.sh" >> /docker/d-bootstrap.list; \
 chmod +x /docker/d-bootstrap-magento.sh
 
 USER rootless
-
-RUN echo '* * * * * /usr/local/bin/php /var/www/bin/magento cron:run 2>&1 | grep -v "Ran jobs by schedule" >> /var/www/var/log/cron.log' \
-    > /var/mycron && \
-    crontab /var/mycron
