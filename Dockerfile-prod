@@ -35,8 +35,9 @@ RUN echo "* * * * * rootless /usr/local/bin/php /var/www/bin/magento cron:run 2>
     echo "" >> /etc/crontab
 
     # Créer les fichiers de log avec les bonnes permissions
-RUN touch /var/www/var/log/magento.cron.log && \
-    chown rootless:rootless /var/www/var/log/*.cron.log
+RUN mkdir -p /var/www/var/log && \
+    touch /var/www/var/log/magento.cron.log && \
+    chown -R rootless:rootless /var/www/var/log/*.cron.log
 
 RUN set -eux; \
 echo "/docker/d-bootstrap-magento.sh" >> /docker/d-bootstrap.list; \
