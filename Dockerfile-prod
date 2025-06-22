@@ -34,7 +34,7 @@ COPY --chown=rootless:rootless system /
     # Créer les fichiers de log avec les bonnes permissions
 RUN mkdir -p /home/rootless && \
     touch /home/rootless/magento.cron.log && \
-    chmod 644 /home/rootless/magento.cron.lo
+    chmod 644 /home/rootless/magento.cron.log
 
 RUN echo '* * * * * /usr/local/bin/php /var/www/bin/magento cron:run 2>&1 | grep -v "Ran jobs by schedule" >> /home/rootless/magento.cron.log' \
     > /home/rootless/mycron && \
