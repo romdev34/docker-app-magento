@@ -39,6 +39,8 @@ RUN mkdir -p /var/www/var/log && \
     touch /var/www/var/log/magento.cron.log && \
     chown -R rootless:rootless /var/www/var/log/*.cron.log
 
+CMD ["sh", "-c", "service cron start && tail -f /var/www/var/log/magento.cron.log"]
+
 RUN set -eux; \
 echo "/docker/d-bootstrap-magento.sh" >> /docker/d-bootstrap.list; \
 chmod +x /docker/d-bootstrap-magento.sh
