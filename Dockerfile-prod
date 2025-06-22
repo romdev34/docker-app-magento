@@ -33,7 +33,8 @@ COPY --chown=rootless:rootless system /
 
 
     # Créer les fichiers de log avec les bonnes permissions
-RUN touch /var/www/var/log/cron.log && \
+RUN mkdir -p /var/www/var/log && \
+    touch /var/www/var/log/cron.log && \
     touch /var/mycron && \
     chmod 644 /var/www/var/log/cron.log && \
     chmod 644 /var/mycron
