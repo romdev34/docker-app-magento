@@ -4,6 +4,18 @@ REDIS_CACHE_CONTAINER := $(shell docker ps --filter "name=redis-cache" --format 
 REDIS_SESSION_CONTAINER := $(shell docker ps --filter "name=redis-session" --format '{{.Names}}' | head -n 1)
 
 
+down-prod:
+	docker compose -f docker-compose.prod down
+up-prod:
+	docker compose -f docker-compose.prod up
+up-prod-build:
+	docker compose -f docker-compose.prod up --build
+down-local:
+	docker compose -f docker-compose.local down
+up-local-build:
+	docker compose -f docker-compose.local up
+	up-local:
+	docker compose -f docker-compose.local up --build
 # Magento - Bash
 bash:
 	docker exec -ti $(MAGENTO_CONTAINER) bash
