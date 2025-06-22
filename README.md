@@ -465,3 +465,6 @@ Lorsque l'on souhaite switcher d'une version avec elasticsuite / magesuite a la 
 Il faut rejouer le setup install
 Il faut remettre par défaut le theme luma dans la base de donnée
 Il faut désintaller et réinstaller la base selon l'installation choisie
+
+## CRONS
+le processus cron est géré dans le supervisor
