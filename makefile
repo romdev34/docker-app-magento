@@ -5,17 +5,17 @@ REDIS_SESSION_CONTAINER := $(shell docker ps --filter "name=redis-session" --for
 
 
 down-prod:
-	docker compose -f docker-compose.prod down
+	docker compose -f docker-compose.prod.yml down
 up-prod:
-	docker compose -f docker-compose.prod up
+	docker compose -f docker-compose.prod.yml up
 up-prod-build:
-	docker compose -f docker-compose.prod up --build
+	docker compose -f docker-compose.prod.yml up --build
 down-local:
-	docker compose -f docker-compose.local down
+	docker compose -f docker-compose.local.yml down
 up-local-build:
-	docker compose -f docker-compose.local up
+	docker compose -f docker-compose.local.yml up
 	up-local:
-	docker compose -f docker-compose.local up --build
+	docker compose -f docker-compose.local.yml up --build
 # Magento - Bash
 bash:
 	docker exec -ti $(MAGENTO_CONTAINER) bash
