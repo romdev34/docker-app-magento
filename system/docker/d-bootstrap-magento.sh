@@ -44,14 +44,6 @@ if [ "$MAGE_MODE" != "developer" ]; then
       --strategy=quick \
       en_US fr_FR
 
-      bin/magento \
-      setup:static-content:deploy \
-      --jobs=6 \
-      --force \
-      --strategy=quick \
-      --area adminhtml \
-      fr_FR
-
     bin/magento maintenance:disable
   fi
 else

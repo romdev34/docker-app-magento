@@ -1,6 +1,6 @@
 # Installation et utilisation
 
-#### prérequis avoir donner les bons droits au dossier dans lequel va etre installé magento:
+#### prérequis 
 
 * récupérer les clés d'acces https://commercemarketplace.adobe.com/customer/accessKeys/
 *  Créer fichier auth.json en indiquant les clés d'accès
@@ -10,20 +10,18 @@
   https://github.com/artifakt-io/base-magento/blob/2.4/app/etc/env.php.sample
 
 
-### ETAPES CREATION DU PROJET
-
-#### récupérer le projet app-magento
+## architecture docker
+Cloner le projet
 git clone git@gitlab.com:docker3580037/app-magento.git
 
+ créer un dossier .composer à la racine do projet et y mettre le fichier .auth.json
 
-#### créer un dossier .composer
+ Vérifier les variables dans le fichier .env
+ Créer un fichier .env.prod sur le serveur concerné
 
-### Si on souhaite récupérer la derniere version de magento faire ceci 
+## installation des soures (sans récupération projet existant)
 
-#### supprimer le dossier src
-
-Ensuite il faut récupéerer les sources magento2 dans un dossier src/
-Changer la version latest en fonction des versions images app-php dispos
+Changer la version de l'image en fonction des versions images app-php dispos
 
 ```shell
 docker run -it --rm \
@@ -43,17 +41,18 @@ docker run -it --rm \
 ulysse699/composer:latest \
 create-project --repository-url=https://repo.magento.com/ magento/project-community-edition src
 ```
+## installation des soures avec projet existant
+Il faut placer les sources dans un dossier src
 
-
+## MAJ des droits
 >dans le dossier magento
 find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} +
-CopyToggle Text Wrapping
-find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
-CopyToggle Text Wrapping
-chown -R :<web server group> .
-CopyToggle Text Wrapping
-chmod u+x bin/magento
 
+find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+
+chown -R :<web server group> .
+
+chmod u+x bin/magento
 
 > Copier coller le fichier auth.json dans le dossier src crée précédemment.**
 
@@ -61,51 +60,14 @@ chmod u+x bin/magento
 Si non le récupérer dans la version officielle magento dans github par exemple:
 https://github.com/magento/magento2/blob/2.4.6-p2/.gitignore``
 in
-## Installation 
+## Installation de magento
 
-### local
-
-
-```shell
-docker compose -f docker-compose.local.yml up --build
-```
-
-
-```shell
-docker compose -f docker-compose.local.yml up
-```
-
-```shell
-docker compose -f docker-compose.local.yml down
-```
-
-```shell
-docker compose -f docker-compose.local.yml exec magento bash
-```
-
-### si soucis avec la DB reinitialisation du volume
-```shell
-docker compose -f docker-compose.local.yml down -v
-```
-
-### production
-
-
-
-```shell
-docker compose -f docker-compose.prod.yml up --build
-```
-
-```shell
-docker compose -f docker-compose.prod.yml down
-```
-
-```shell
-docker compose -f docker-compose.prod.yml exec magento bash
-```
-
+### prerequis
 penser à enlever le fichier .env.php si on doit réinstaller le projet
-rajouter dans /etc/hosts magento.dev.local
+
+rajouter dans /etc/hosts le nom de domaine souhaité
+
+mettre à jour les droits mysql
 
 ```shell
 docker compose -f docker-compose.prod.yml exec mysql bash -c "mysql -uroot -proot << EOF
@@ -118,10 +80,9 @@ MAX_UPDATES_PER_HOUR 0
 MAX_USER_CONNECTIONS 0;
 EOF"
 ```
-
+### installation
 ```shell
 docker compose exec magento bash
-
 bin/magento \
         setup:install \
         --base-url=$BASE_URL\
@@ -155,69 +116,155 @@ bin/magento \
         --cache-backend-redis-password="" \
         --cache-backend-redis-compression-lib=""
 ```
----
 
-Ou bien faire directement dans le conteneur (en ayant pris soin de vérifier les variables dans le ficher .env)
-
-```
-        bin/magento \
-        setup:install \
-        --base-url=$BASE_URL\
-        --db-host=$MYSQL_HOST \
-        --db-name=$MYSQL_DATABASE \
-        --db-user=$MYSQL_USER \
-        --db-password=$MYSQL_PASSWORD \
-        --admin-firstname=$ADMIN_FIRSTNAME \
-        --admin-lastname=$ADMIN_LASTNAME \
-        --admin-email=$ADMIN_EMAIL \
-        --admin-user=$ADMIN_USER \
-        --admin-password=$ADMIN_PASSWORD \
-        --language=$LANGUAGE \
-        --currency=$CURRENCY \
-        --timezone=$TIMEZONE \
-        --search-engine $SEARCH_ENGINE \
-        --elasticsearch-host $ELASTICSEARCH_HOST \
-        --elasticsearch-port $ELASTICSEARCH_PORT \
-        --use-rewrites=$USE_REWRITE \
-        --backend-frontname=$BACKEND_FRONTNAME \
-        --session-save=redis \
-        --session-save-redis-host=$REDIS_SESSION_HOST \
-        --session-save-redis-port=$REDIS_SESSION_PORT \
-        --session-save-redis-log-level=1 \
-        --session-save-redis-db=2 \
-        --cache-backend-redis-server=$REDIS_CACHE_HOST \
-        --cache-backend=redis \
-        --cache-backend-redis-port=$REDIS_CACHE_PORT \
-        --cache-backend-redis-db=0 \
-        --cache-backend-redis-compress-data=1 \
-        --cache-backend-redis-password="" \
-        --cache-backend-redis-compression-lib=""
-
-```
-### install en prod
-
-
-## Install dans k8s
-
-* Construction de l'image
+### commandes jouer en local
+Compilation
 ```shell
-docker build . \
---tag ulysse699/app-magento:latest \
---build-arg "UID=$(id -u)" \
---build-arg "GID=$(id -g)" \
---build-arg "GIT_COMMIT=$(git rev-parse HEAD)" \
---build-arg "COMPOSER_AUTH=$(cat ./auth.json)" \
---build-arg "STATIC_LANGUAGES=en_US fr_FR" \
---build-arg "STATIC_JOBS=6"
+rm -rf $(pwd)/src/generated/*; \
+docker compose -f docker-compose.local exec magento \
+bin/magento \
+setup:di:compile
 ```
 
-* Push de l'image dans le registry
-```
-docker push ulysse699/app-magento:latest
+MAJ des statics
+```shell
+rm -rf $(pwd)/src/var/view_preprocessed/*; \
+rm -rf $(pwd)/src/pub/static/*; \
+docker compose -f docker-compose.local exec magento \
+bin/magento \
+setup:static-content:deploy \
+--jobs=6 \
+--force \
+fr_FR \
+en_US
 ```
 
-* Installation de magento 2 dans l'environnement.
-> le configmap devra etre mis à jour en fonction de l'environnement
+MAJ de la bdd
+```shell
+docker compose -f docker-compose.local exec magento \
+bin/magento \
+setup:upgrade
+```
+cache clean
+```shell
+docker compose -f docker-compose.local exec magento \
+bin/magento \
+cache:clean
+```
+cache flush
+```shell
+docker compose -f docker-compose.local exec magento \
+bin/magento \
+cache:flush
+```
+
+reindex
+```shell
+docker compose -f docker-compose.local exec magento \
+bin/magento \
+indexer:reindex
+```
+
+Docker compose up build
+```shell
+docker compose -f docker-compose.local.yml up --build
+```
+
+Docker compose up
+```shell
+docker compose -f docker-compose.local.yml up
+```
+
+Docker compose down
+```shell
+docker compose -f docker-compose.local.yml down
+```
+
+Bash conteneur magento
+```shell
+docker compose -f docker-compose.local.yml exec magento bash
+```
+
+NB si soucis avec la base de donnée, on peut réinitialiser le volume avec
+```shell
+docker compose -f docker-compose.local.yml down -v
+```
+Voir le status des process
+```shell
+docker compose -f docker-compose.local.yml exec -it magento supervisorctl status
+```
+### commandes à jouer en production
+
+### en prod
+MAJ de la bdd
+```shell
+docker compose exec magento \
+bin/magento \
+setup:upgrade
+```
+Compilation
+```shell
+docker compose exec magento \
+bin/magento \
+setup:di:compile
+```
+MAJ des statics
+```shell
+bin/magento \
+setup:static-content:deploy \
+--jobs=6 \
+--force \
+--strategy=quick \
+en_US fr_FR
+```
+cache clean
+```shell
+docker compose -f docker-compose.prod exec magento \
+bin/magento \
+cache:clean
+```
+cache flush
+```shell
+docker compose -f docker-compose.prod exec magento \
+bin/magento \
+cache:flush
+```
+reindex
+```shell
+docker compose -f docker-compose.prod exec magento \
+bin/magento \
+indexer:reindex
+```
+Docker compose up build
+```shell
+docker compose -f docker-compose.prod.yml up --build
+```
+Docker compose up
+```shell
+docker compose -f docker-compose.prod.yml up 
+```
+Docker compose down
+```shell
+docker compose -f docker-compose.prod.yml down
+```
+Bash conteneur magento
+```shell
+docker compose -f docker-compose.prod.yml exec magento bash
+```
+NB si soucis avec la base de donnée, on peut réinitialiser le volume avec
+```shell
+docker compose -f docker-compose.prod.yml down -v
+```
+Voir le status des process
+```shell
+docker compose -f docker-compose.prod.yml exec -it magento supervisorctl status
+```
+arreter un process (exemple server-fpm)
+```shell
+docker compose -f docker-compose.prod.yml exec -it magento supervisorctl stop server:server-fpm
+```
+## Install dans k8s
+TODO...
 
 ## MAIL
 Si erreur Unsupported sendmail command flags \"/usr/sbin/sendmail-local --smtp-addr=mailhog:1025\"; must be one of \"-bs\" or \"-t\" 
@@ -246,13 +293,61 @@ bin/magento setup:config:set --session-save=redis --session-save-redis-host=$RED
 ```
 j'avais un soucis avec le session save au moment de mes tests donc peut etre éviter la partie session pour redis
 
+### CLEAR LE CACHE REDIS
+````shell
+docker compose -f docker-compose.prod.yml exec -it redis-cache redis-cli FLUSHALL
+````
+````shell
+docker compose -f docker-compose.prod.yml exec -it redis-session redis-cli FLUSHALL
+````
+ ## VARNISH
 > SI ON UTILISE VARNISH
 ````shell
 bin/magento config:set --scope=default --scope-code=0 system/full_page_cache/caching_application 2
-Copy
 ````
-Ceci n'est pas testé donc à confirmer.
-## Varnish
+
+```shell
+bin/magento \
+config:set \
+system/full_page_cache/ttl \
+"86400"
+```
+
+```shell
+bin/magento \
+config:set \
+system/full_page_cache/varnish/access_list \
+"$(docker compose exec varnish hostname -i)"
+```
+
+```shell
+bin/magento \
+config:set \
+system/full_page_cache/varnish/backend_host \
+"magento"
+```
+
+```shell
+bin/magento \
+config:set \
+system/full_page_cache/varnish/backend_port \
+"8080"
+```
+
+```shell
+varnishadm 'ban req.url ~ .'
+```
+
+```shell
+ varnishlog
+```
+
+```shell
+varnishlog -g raw -i backend_health
+```
+>TODO a  debugguer
+Si 503  avec varnish potentiellement un soucis avec le .probe.url du fichier de config.
+Potentiellement on peut avoir un soucis de config de cache avec le env.php
 indiquer l'IP / PORT du container / server varnish
 php bin/magento setup:config:set --no-interaction --http-cache-hosts=192.168.192.10:80
 
@@ -280,9 +375,25 @@ modifier le env.php selon les RABBITMQ_USER et RABBITMQ_PASSWORD définis dans l
     ]
 ]
 ```
-## Commande docker
 
+## DOCKER
+* Construction de l'image magento 
+```shell
+docker build . \
+--tag ulysse699/app-magento:latest \
+--build-arg "UID=$(id -u)" \
+--build-arg "GID=$(id -g)" \
+--build-arg "GIT_COMMIT=$(git rev-parse HEAD)" \
+--build-arg "COMPOSER_AUTH=$(cat ./auth.json)" \
+--build-arg "STATIC_LANGUAGES=en_US fr_FR" \
+--build-arg "STATIC_JOBS=6"
+```
 
+* Push de l'image dans le registry
+```
+docker push ulysse699/app-magento:latest
+```
+## COMPOSER
 Pour jouer un composer install faire
 ```shell
 docker run -it --rm \
@@ -302,58 +413,13 @@ docker run -it --rm \
 ulysse699/composer:latest \
 update
 ```
-
+## LOGS
+Voir les logs
 ```shell
-docker run -d \
---net host \
---name app-magento \
-ulysse699/app-magento:latest
+docker container logs docker-app-magento-magento-1
 ```
 
-```shell
-docker container logs app-magento
-```
-
-```shell
-docker compose exec -it magento supervisorctl status
-```
-
-```shell
-docker compose exec -it magento supervisorctl stop server:server-fpm
-```
-
-```shell
-until docker exec -it app-magento /docker/d-health.sh >/dev/null 2>&1; do \
-  (echo >&2 "Waiting..."); \
-  sleep 2; \
-done
-```
-
-```shell
-docker exec -it app-magento supervisorctl start server:server-fpm
-```
-
-```shell
-docker compose exec -it magento bash
-```
-
-```shell
-docker stop app-magento
-```
-
-```shell
-docker rm app-magento
-```
-
-```shell
-rm -rf src/app/etc/env.php
-```
-
-```shell
-sudo nano /etc/hosts
-```
-
-SSL en local
+## SSL en local
 générer les certificats en local dans traefik/certs
 Les importer dans chrome et firefox
 ```text
@@ -365,143 +431,8 @@ Les importer dans chrome et firefox
 127.0.0.1 magento-dev.local
 ```
 
-```shell
-docker compose up
-```
 
-```shell
-docker compose exec magento cp \
-/var/www/app/etc/env.template.php \
-/var/www/app/etc/env.php
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-app:config:import
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-setup:upgrade
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-cache:clean
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-cache:flush
-```
-
-```shell
-rm -rf $(pwd)/src/generated/*; \
-docker compose exec magento \
-bin/magento \
-setup:di:compile
-```
-
-```shell
-rm -rf $(pwd)/src/var/view_preprocessed/*; \
-rm -rf $(pwd)/src/pub/static/*; \
-docker compose exec magento \
-bin/magento \
-setup:static-content:deploy \
---jobs=6 \
---force \
-fr_FR \
-en_US
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-indexer:reindex
-```
-### REDIS
-
-````shell
-docker compose exec -it redis-cache redis-cli FLUSHALL
-````
-````shell
-docker compose exec -it redis-session redis-cli FLUSHALL
-````
-
-### Configuration
-
-Varnish
-
-```shell
-docker compose exec magento \
-bin/magento \
-config:set \
-system/full_page_cache/caching_application \
-"2"
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-config:set \
-system/full_page_cache/ttl \
-"86400"
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-config:set \
-system/full_page_cache/varnish/access_list \
-"$(docker compose exec varnish hostname -i)"
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-config:set \
-system/full_page_cache/varnish/backend_host \
-"magento"
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-config:set \
-system/full_page_cache/varnish/backend_port \
-"8080"
-```
-
-```shell
-docker compose exec magento \
-bin/magento \
-cache:clean
-```
-
-```shell
-docker compose exec varnish \
-varnishadm 'ban req.url ~ .'
-```
-
-```shell
-docker compose exec varnish \
- varnishlog
-```
-
-```shell
-docker compose exec varnish \
-varnishlog -g raw -i backend_health
-```
->TODO a  debugguer
-Si 503  avec varnish potentiellement un soucis avec le .probe.url du fichier de config.
-Potentiellement on peut avoir un soucis de config de cache avec le env.php
-
-
-### Tests
+## Tests
 
 PHPUnit
 
@@ -513,7 +444,7 @@ ulysse699/php:v8.2 \
 /src/bin/phpunit \
 --do-not-cache-result
 ```
-### ELASTICSUITE / MAGESUITE
+## ELASTICSUITE / MAGESUITE
 
 Il faut impérativement installer les plugins suivants
 bin/elasticsearch-plugin install analysis-phonetic;
@@ -534,13 +465,3 @@ Lorsque l'on souhaite switcher d'une version avec elasticsuite / magesuite a la 
 Il faut rejouer le setup install
 Il faut remettre par défaut le theme luma dans la base de donnée
 Il faut désintaller et réinstaller la base selon l'installation choisie
-
-
-###
-
-Déploiement en prod
-créer un fichier .env.prod
-
-Si soucis d'affichge pour le BO
-
-bin/magento  setup:static-content:deploy -a adminhtml -l fr_FR
