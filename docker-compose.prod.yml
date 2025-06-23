@@ -132,17 +132,6 @@ services:
     hostname: magento
     env_file:
       - .env.prod
-    labels:
-      - "traefik.enable=true"
-      # URL pour accéder à ce conteneur
-      - "traefik.http.routers.magento.rule=Host(`magento.romdev.ovh`)"
-      - "traefik.http.routers.magento.entrypoints=websecure"
-      # Activation de TLS
-      - "traefik.http.routers.magento.tls=true"
-      - "traefik.http.routers.magento.tls.certresolver=letsencrypt"
-      # Si le port est différent de 80, utilisez le service suivant:
-      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
-      - traefik.http.services.magento.loadbalancer.server.port=8080
     volumes:
       - ./src:/var/www:rw,delegated
     links:

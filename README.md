@@ -307,32 +307,15 @@ bin/magento config:set --scope=default --scope-code=0 system/full_page_cache/cac
 ````
 
 ```shell
-bin/magento \
-config:set \
-system/full_page_cache/ttl \
-"86400"
+bin/magento setup:config:set --http-cache-hosts=varnish:80
 ```
 
-```shell
-bin/magento \
-config:set \
-system/full_page_cache/varnish/access_list \
-"$(docker compose exec varnish hostname -i)"
-```
-
-```shell
-bin/magento \
-config:set \
-system/full_page_cache/varnish/backend_host \
-"magento"
-```
-
-```shell
-bin/magento \
-config:set \
-system/full_page_cache/varnish/backend_port \
-"8080"
-```
+Dans store configuration advanced system full page cache
+On doit avoir
+access list: localhost,127.0.0.1,magento
+Backend host: magento
+Backend port: 8080 (le port du backend)
+grace period: 300
 
 ```shell
 docker compose -f docker-compose.prod.yml exec -it varnish
@@ -356,11 +339,6 @@ Récupérer la valeur des fichiers env.php et config.php et les recréer ces fic
 
 Supprimer l'image, re build l'image re push l'image et normalement magento devrait etre installé avec env.php et config.php et le script de l'upgrade du compile et des statics devraient etres lancé au moment du lancement de l'image magento.
 
-Activer le https pour les URL front et back
-docker exec magento bin/magento config:set web/secure/use_in_frontend 1
-docker exec testmage-magento-1 bin/magento config:set web/secure/use_in_adminhtml 1
-
-Vérifier dans le store config également l'URL de l'admin si nécessaire
 
 ## RABBITMQ
 modifier le env.php selon les RABBITMQ_USER et RABBITMQ_PASSWORD définis dans le env et dans docker-compose.yml

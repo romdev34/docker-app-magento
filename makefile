@@ -12,6 +12,8 @@ up-prod-build:
 	docker compose -f docker-compose.prod.yml up --build
 down-local:
 	docker compose -f docker-compose.local.yml down
+up-local:
+	docker compose -f docker-compose.local.yml up
 up-local-build:
 	docker compose -f docker-compose.local.yml up
 	up-local:

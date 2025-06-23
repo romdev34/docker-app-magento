@@ -19,7 +19,12 @@ backend default {
 }
 
 acl purge {
+    "localhost";
+    "127.0.0.1";
     "magento";
+    "172.16.0.0"/12;
+    "192.168.0.0"/16;
+    "10.0.0.0"/8;
 }
 
 sub vcl_recv {
@@ -131,7 +136,6 @@ sub vcl_hash {
         hash_data(req.http.X-Forwarded-Proto);
     }
 
-
     if (req.url ~ "/graphql") {
         call process_graphql_headers;
     }
@@ -157,7 +161,6 @@ sub process_graphql_headers {
 }
 
 sub vcl_backend_response {
-
     set beresp.grace = 3d;
 
     if (beresp.http.content-type ~ "text") {
@@ -170,6 +173,12 @@ sub vcl_backend_response {
 
     if (beresp.http.X-Magento-Debug) {
         set beresp.http.X-Magento-Cache-Control = beresp.http.Cache-Control;
+    }
+
+    # CORRECTION: Utiliser les headers de Magento pour le cache
+    if (beresp.http.X-Magento-Cache-Control) {
+        set beresp.http.Cache-Control = beresp.http.X-Magento-Cache-Control;
+        unset beresp.http.X-Magento-Cache-Control;
     }
 
     # cache only successfully responses and 404s that are not marked as private
@@ -210,20 +219,22 @@ sub vcl_deliver {
     if (resp.http.x-varnish ~ " ") {
         set resp.http.X-Magento-Cache-Debug = "HIT";
         set resp.http.Grace = req.http.grace;
+        set resp.http.X-Varnish-Cache = "HIT";
+        set resp.http.X-Varnish-Hits = obj.hits;
     } else {
         set resp.http.X-Magento-Cache-Debug = "MISS";
+        set resp.http.X-Varnish-Cache = "MISS";
     }
 
-    # Not letting browser to cache non-static files.
-    if (resp.http.Cache-Control !~ "private" && req.url !~ "^/(pub/)?(media|static)/") {
-        set resp.http.Pragma = "no-cache";
-        set resp.http.Expires = "-1";
-        set resp.http.Cache-Control = "no-store, no-cache, must-revalidate, max-age=0";
-    }
-
+    # SUPPRIMÉ: La section qui écrasait les headers de cache
+    # Cette section forçait "no-cache" et empêchait le bon fonctionnement du cache browser
+    
+    # Garder l'âge du cache pour le debug
     if (!resp.http.X-Magento-Debug) {
-        unset resp.http.Age;
+        # Garder Age pour voir le cache en action
+        # unset resp.http.Age;
     }
+    
     unset resp.http.X-Magento-Debug;
     unset resp.http.X-Magento-Tags;
     unset resp.http.X-Powered-By;

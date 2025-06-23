@@ -54,6 +54,10 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-nopassword}
     volumes:
       - mysql-data:/var/lib/mysql:rw,delegated
+    command: >
+      --innodb_buffer_pool_size=512M
+      --max_allowed_packet=64M
+      --innodb_log_file_size=256M
     ports:
       - '3306:3306'
     networks:
@@ -154,16 +158,6 @@ services:
     hostname: magento
     env_file:
       - .env
-    labels:
-      - "traefik.enable=true"
-      # URL pour accéder à ce conteneur
-      - "traefik.http.routers.magento.rule=Host(`magento.dev.local`)"
-      - "traefik.http.routers.magento.entrypoints=websecure"
-      # Activation de TLS
-      - "traefik.http.routers.magento.tls=true"
-      # Si le port est différent de 80, utilisez le service suivant:
-      # - "traefik.http.services.<service_name>.loadbalancer.server.port=<port>"
-      - traefik.http.services.magento.loadbalancer.server.port=8080
     volumes:
       - ./src:/var/www:rw,delegated
     links:
