@@ -343,18 +343,62 @@ Supprimer l'image, re build l'image re push l'image et normalement magento devra
 ## RABBITMQ
 modifier le env.php selon les RABBITMQ_USER et RABBITMQ_PASSWORD définis dans le env et dans docker-compose.yml
 
-```'queue' => [
-    'consumers_wait_for_messages' => 1,
-    'amqp' => [
-        'host' => 'rabbitmq',
-        'port' => '5672',
-        'user' => 'rootless',
-        'password' => 'nopassword',
-        'virtualhost' => 'magento'
-    ]
-]
+```php
+    'queue' => [
+        'consumers_wait_for_messages' => 1,
+        'amqp' => [
+            'host' => 'rabbitmq',
+            'port' => '5672',
+            'user' => 'rootless',
+            'password' => 'nopassword',
+            'virtualhost' => '/'
+        ]
+    ],
+```
+Pour que les queues démarrent lister les queues actives coté magento
+```shell
+bin/magento queue:consumers:list
 ```
 
+Pour les activer modifier le env.php en fonction des queues listées au dessus
+```php
+    'cron_consumers_runner' => [
+        'cron_run' => true,
+        'max_messages' => 1000,
+        'consumers' => [
+            'async.operations.all',
+            'product_action_attribute.update',
+            'product_action_attribute.website.update',
+            'catalog_website_attribute_value_sync',
+            'media.storage.catalog.image.resize',
+            'exportProcessor',
+            'inventory.source.items.cleanup',
+            'inventory.mass.update',
+            'inventory.reservations.cleanup',
+            'inventory.reservations.update',
+            'inventory.reservations.updateSalabilityStatus',
+            'inventory.indexer.sourceItem',
+            'inventory.indexer.stock',
+            'media.content.synchronization',
+            'media.gallery.renditions.update',
+            'media.gallery.synchronization',
+            'codegeneratorProcessor',
+            'sales.rule.update.coupon.usage',
+            'sales.rule.quote.trigger.recollect',
+            'product_alert',
+            'saveConfigProcessor'
+        ]
+    ],
+```
+
+Si on souhaite activer tous les consumers disponibles
+```php
+    'cron_consumers_runner' => [
+        'cron_run' => true,
+        'max_messages' => 1000,
+        'consumers' => []
+    ],
+```
 ## DOCKER
 * Construction de l'image magento 
 ```shell

@@ -216,6 +216,10 @@ sub vcl_backend_response {
 }
 
 sub vcl_deliver {
+        # POUR DEBUG : Exposer les cache tags aux clients
+    if (resp.http.X-Magento-Tags) {
+        set resp.http.X-Debug-Cache-Tags = resp.http.X-Magento-Tags;
+    }
     if (resp.http.x-varnish ~ " ") {
         set resp.http.X-Magento-Cache-Debug = "HIT";
         set resp.http.Grace = req.http.grace;
