@@ -7,13 +7,13 @@ REDIS_SESSION_CONTAINER := $(shell docker ps --filter "name=redis-session" --for
 down-prod:
 	docker compose -f docker-compose.prod.yml down
 up-prod:
-	docker compose -f docker-compose.prod.yml up
+	docker compose -f docker-compose.prod.yml up -d
 up-prod-build:
 	docker compose -f docker-compose.prod.yml up --build
 down-local:
 	docker compose -f docker-compose.local.yml down
 up-local:
-	docker compose -f docker-compose.local.yml up
+	docker compose -f docker-compose.local.yml up -d
 up-local-build:
 	docker compose -f docker-compose.local.yml up
 	up-local:

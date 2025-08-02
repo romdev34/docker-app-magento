@@ -5,3 +5,4 @@ src/*
 /auth.json
 .env.prod
 src/
+.php-cs-fixer.cache

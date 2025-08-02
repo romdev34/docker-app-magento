@@ -44,7 +44,7 @@ services:
     labels:
       - "traefik.enable=true"
       # URL pour accéder à ce conteneur
-      - "traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.romdev.ovh`)"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`magento-phpmyadmin.romdev.ovh`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       # Activation de TLS
       - "traefik.http.routers.phpmyadmin.tls=true"
@@ -61,8 +61,6 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - PMA_USER=rootless
       - PMA_PASSWORD=nopassword
-    ports:
-      - '8082:80'
     networks:
       - proxy
 
