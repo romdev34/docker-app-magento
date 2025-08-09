@@ -19,19 +19,31 @@ up-local-build:
 # Magento - Bash
 bash:
 	docker exec -ti $(MAGENTO_CONTAINER) bash
+	$(MAKE) cc
+	$(MAKE) cf
 
 # Magento - Compilation & statics
 se-di:
 	docker exec -ti $(MAGENTO_CONTAINER) bin/magento setup:di:compile
+	$(MAKE) cc
+	$(MAKE) cf
 
 deploy-statics:
 	docker exec -ti $(MAGENTO_CONTAINER) bash -c "rm -rf var/view_preprocessed/*"
 	docker exec -ti $(MAGENTO_CONTAINER) bash -c "rm -rf pub/static/*"
 	docker exec -ti $(MAGENTO_CONTAINER) bin/magento setup:static-content:deploy --jobs=6 --strategy=quick --force fr_FR en_US
 	$(MAKE) cc
+	$(MAKE) cf
+
+deploy-statics-prod:
+	docker exec -ti $(MAGENTO_CONTAINER) bin/magento setup:static-content:deploy --force
+	$(MAKE) cc
+	$(MAKE) cf
 
 se-up:
 	docker exec -ti $(MAGENTO_CONTAINER) bin/magento setup:upgrade --keep-generated
+	$(MAKE) cc
+	$(MAKE) cf
 
 # Magento - Cache
 cc:
@@ -54,3 +66,11 @@ redis-session-flush:
 # Logs
 logs:
 	docker logs $(MAGENTO_CONTAINER)
+
+clean-total:
+	$(MAKE) se-up
+	$(MAKE) cc
+	$(MAKE) se-di
+	$(MAKE) deploy-statics-prod
+	$(MAKE) cc
+	$(MAKE) cf
