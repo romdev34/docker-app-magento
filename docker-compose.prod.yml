@@ -58,9 +58,6 @@ services:
     image: phpmyadmin/phpmyadmin:latest
     environment:
       - PMA_HOST=mysql
-      - MYSQL_ROOT_PASSWORD=root
-      - PMA_USER=rootless
-      - PMA_PASSWORD=nopassword
     networks:
       - proxy
 
