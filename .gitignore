@@ -1,7 +1,6 @@
 /.idea
 /.DS_Store
 /.composer
-src/*
 /auth.json
 .env.prod
 src/

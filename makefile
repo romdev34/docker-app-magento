@@ -15,8 +15,6 @@ down-local:
 up-local:
 	docker compose -f docker-compose.local.yml up -d
 up-local-build:
-	docker compose -f docker-compose.local.yml up
-	up-local:
 	docker compose -f docker-compose.local.yml up --build
 # Magento - Bash
 bash:
@@ -27,7 +25,10 @@ se-di:
 	docker exec -ti $(MAGENTO_CONTAINER) bin/magento setup:di:compile
 
 deploy-statics:
+	docker exec -ti $(MAGENTO_CONTAINER) bash -c "rm -rf var/view_preprocessed/*"
+	docker exec -ti $(MAGENTO_CONTAINER) bash -c "rm -rf pub/static/*"
 	docker exec -ti $(MAGENTO_CONTAINER) bin/magento setup:static-content:deploy --jobs=6 --strategy=quick --force fr_FR en_US
+	$(MAKE) cc
 
 se-up:
 	docker exec -ti $(MAGENTO_CONTAINER) bin/magento setup:upgrade --keep-generated
