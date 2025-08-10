@@ -67,7 +67,7 @@ penser à enlever le fichier .env.php si on doit réinstaller le projet
 
 rajouter dans /etc/hosts le nom de domaine souhaité
 
-mettre à jour les droits mysql
+#### mettre à jour les droits mysql
 
 ```shell
 docker compose -f docker-compose.prod.yml exec mysql bash -c "mysql -uroot -p${MYSQL_ROOT_PASSWORD} << EOF
@@ -77,6 +77,10 @@ GRANT ALL PRIVILEGES ON *.* TO 'romdev'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOF
 ```
+
+La création de ces utilisateurs régissent l'accès au phpmyadmin
+Attention à mettre à jour le env.php si l'on remplace le user mysql
+
 ### installation
 ```shell
 docker compose exec magento bash
