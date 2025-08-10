@@ -19,6 +19,8 @@ services:
       - proxy
 
   mysql:
+    env_file:
+      - .env.prod
     image: mysql:${MYSQL_VERSION:-8.0}
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
