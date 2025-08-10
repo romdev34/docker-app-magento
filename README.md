@@ -70,15 +70,12 @@ rajouter dans /etc/hosts le nom de domaine souhaité
 mettre à jour les droits mysql
 
 ```shell
-docker compose -f docker-compose.prod.yml exec mysql bash -c "mysql -uroot -proot << EOF
-REVOKE ALL PRIVILEGES ON *.* FROM 'rootless'@'%';
-GRANT ALL PRIVILEGES ON *.* TO 'rootless'@'%';
-ALTER USER 'rootless'@'%' REQUIRE NONE WITH
-MAX_QUERIES_PER_HOUR 0
-MAX_CONNECTIONS_PER_HOUR 0
-MAX_UPDATES_PER_HOUR 0
-MAX_USER_CONNECTIONS 0;
-EOF"
+docker compose -f docker-compose.prod.yml exec mysql bash -c "mysql -uroot -p${MYSQL_ROOT_PASSWORD} << EOF
+DROP USER IF EXISTS 'username'@'%';
+CREATE USER 'username'@'%' IDENTIFIED BY 'motdepasse';
+GRANT ALL PRIVILEGES ON *.* TO 'romdev'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EOF
 ```
 ### installation
 ```shell

@@ -19,8 +19,6 @@ up-local-build:
 # Magento - Bash
 bash:
 	docker exec -ti $(MAGENTO_CONTAINER) bash
-	$(MAKE) cc
-	$(MAKE) cf
 
 # Magento - Compilation & statics
 se-di:
